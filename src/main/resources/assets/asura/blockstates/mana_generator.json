@@ -1,0 +1,5 @@
+{
+  "variants": {
+    "": { "model": "asura:block/mana_generator" }
+  }
+}

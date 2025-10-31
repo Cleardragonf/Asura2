@@ -1,0 +1,4 @@
+/give @p asura:mana_generator
+/gamemode survival
+/give
+/give @p asura:mana_generator

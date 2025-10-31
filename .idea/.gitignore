@@ -1,0 +1,77 @@
+# ==============================
+# IntelliJ IDEA
+# ==============================
+.idea/
+*.iml
+out/
+*.ipr
+*.iws
+
+# ==============================
+# Gradle
+# ==============================
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+.gradle-cache/
+.gradle-test-kit/
+bin/
+classes/
+
+# Local Gradle properties (can contain personal paths or keys)
+gradle.properties
+
+# ==============================
+# Minecraft Forge / Fabric
+# ==============================
+# Forge run folders
+run/
+runServer/
+runClient/
+runData/
+logs/
+crash-reports/
+
+# Mappings & generated sources
+build/generated/
+src/generated/
+.minecraft/
+
+# IntelliJ workspace configs for MC Dev plugin
+*.launch
+eclipse/
+.idea_modules/
+
+# ==============================
+# OS Files
+# ==============================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ==============================
+# Environment / Temporary
+# ==============================
+*.tmp
+*.temp
+*.swp
+*.bak
+*.old
+*.log
+*.lock
+*.orig
+
+# ==============================
+# Archives & Distribution
+# ==============================
+*.zip
+*.tar.gz
+*.rar
+*.7z
+*.jar
+*.war
+*.ear
+
+# Allow the mod JAR built by Gradle to be committed (optional)
+# Uncomment the next line if you want to include release builds
+# !build/libs/*.jar
