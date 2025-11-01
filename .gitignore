@@ -1,0 +1,38 @@
+# Minecraft / Forge Gradle
+.gradle/
+build/
+out/
+run/
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# VS Code
+.vscode/
+
+# Logs
+*.log
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Minecraft runtime files
+crash-reports/
+logs/
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+
+# Dependencies (optional)
+libs/
