@@ -17,7 +17,7 @@ public class ManaGeneratorScreen extends AbstractContainerScreen<ManaGeneratorMe
     // === Alignment Offsets ===
     // Adjust to ensure the spinning rings line up perfectly with your new etched circles.
     private static final float CENTER_DX = 0f;   // Left/right adjustment
-    private static final float CENTER_DY = 0f; // Up/down adjustment
+    private static final float CENTER_DY = 1f; // Up/down adjustment
 
     public ManaGeneratorScreen(ManaGeneratorMenu menu, Inventory inv, Component title) {
         super(menu, inv, title);
