@@ -12,6 +12,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -26,24 +27,62 @@ public class ManaGeneratorBlockEntity extends BlockEntity implements MenuProvide
     private String manaType = "None";
 
     // Sync container (2 slots: mana amount + mana type)
-    private final ContainerData data = new SimpleContainerData(2);
+    private final ContainerData data = new SimpleContainerData(8); // mana + manaType + 6 elements
 
     public ManaGeneratorBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.MANA_GENERATOR_ENTITY.get(), pos, state);
     }
 
-    /** Called every tick on the server side to generate mana */
+    private final boolean[] elements = new boolean[6]; // Light, Dark, Fire, Water, Earth, Air
+
     public void tickServer() {
         if (level == null || level.isClientSide) return;
 
-        manaType = detectManaType(level, worldPosition);
+        updateElements(level, worldPosition);
+        manaType = getDominantElement();
         mana += getManaPerTick(manaType);
-        mana = Math.min(mana, 100); // clamp
+        mana = Math.min(mana, 100);
 
-        // Sync to client via container
         data.set(0, mana);
         data.set(1, getManaTypeIndex());
+        for (int i = 0; i < 6; i++) data.set(2 + i, elements[i] ? 1 : 0);
     }
+
+    private void updateElements(Level level, BlockPos pos) {
+        boolean foundLight = level.canSeeSky(pos.above()) && level.isDay();
+        boolean foundDark = !level.canSeeSky(pos) && !level.isDay();
+        boolean foundFire = scanForBlock(level, pos, Blocks.FIRE, Blocks.LAVA);
+        boolean foundWater = scanForBlock(level, pos, Blocks.WATER);
+        boolean foundEarth = scanForBlock(level, pos, Blocks.DIRT, Blocks.GRASS_BLOCK, Blocks.STONE);
+        boolean foundAir = scanForBlock(level, pos, Blocks.AIR);
+
+        elements[0] = foundLight;
+        elements[1] = foundDark;
+        elements[2] = foundFire;
+        elements[3] = foundWater;
+        elements[4] = foundEarth;
+        elements[5] = foundAir;
+    }
+
+    private boolean scanForBlock(Level level, BlockPos origin, Block... targets) {
+        for (BlockPos pos : BlockPos.betweenClosed(origin.offset(-6, -6, -6), origin.offset(6, 6, 6))) {
+            Block b = level.getBlockState(pos).getBlock();
+            for (Block t : targets) if (b == t) return true;
+        }
+        return false;
+    }
+
+    private String getDominantElement() {
+        if (elements[2]) return "Fire";
+        if (elements[3]) return "Water";
+        if (elements[0]) return "Light";
+        if (elements[1]) return "Dark";
+        if (elements[4]) return "Earth";
+        if (elements[5]) return "Air";
+        return "None";
+    }
+
+    public boolean[] getElements() { return elements; }
 
     /** Determines the environment-based mana type */
     private String detectManaType(Level level, BlockPos pos) {

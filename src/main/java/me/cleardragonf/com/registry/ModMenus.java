@@ -1,8 +1,14 @@
-// ModMenus.java
 package me.cleardragonf.com.registry;
 
 import me.cleardragonf.com.menu.ManaGeneratorMenu;
+import me.cleardragonf.com.Asura;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraftforge.common.extensions.IForgeMenuType;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -10,12 +16,11 @@ import net.minecraftforge.registries.RegistryObject;
 
 public class ModMenus {
     public static final DeferredRegister<MenuType<?>> MENUS =
-            DeferredRegister.create(ForgeRegistries.MENU_TYPES, "asura");
+            DeferredRegister.create(ForgeRegistries.MENU_TYPES, Asura.MODID);
 
     public static final RegistryObject<MenuType<ManaGeneratorMenu>> MANA_GENERATOR_MENU =
             MENUS.register("mana_generator_menu",
-                    () -> IForgeMenuType.create((windowId, inv, data) ->
-                            // data may be null, so handle both cases!
-                            new ManaGeneratorMenu(windowId, inv,
-                                    data != null ? data.readBlockPos() : null)));
+                    () -> IForgeMenuType.create((windowId, inv, player) ->
+                            new ManaGeneratorMenu(windowId, inv, null, new SimpleContainerData(8))
+                    ));
 }

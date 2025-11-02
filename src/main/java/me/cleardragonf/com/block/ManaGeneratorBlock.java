@@ -5,6 +5,7 @@ import me.cleardragonf.com.blockentity.ManaGeneratorBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
@@ -51,16 +52,16 @@ public class ManaGeneratorBlock extends BaseEntityBlock {
         } : null;
     }
 
-    // ✅ This method signature is correct for Forge 1.21+
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos,
                                                Player player, BlockHitResult hit) {
         if (!level.isClientSide) {
-            BlockEntity blockEntity = level.getBlockEntity(pos);
-            if (blockEntity instanceof ManaGeneratorBlockEntity generator) {
-                player.openMenu(generator);
+            BlockEntity be = level.getBlockEntity(pos);
+            if (be instanceof MenuProvider provider) {
+                player.openMenu(provider);
             }
         }
         return InteractionResult.sidedSuccess(level.isClientSide);
     }
+
 }
