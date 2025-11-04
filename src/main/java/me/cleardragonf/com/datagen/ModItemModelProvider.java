@@ -1,0 +1,18 @@
+package me.cleardragonf.com.datagen;
+
+import me.cleardragonf.com.Asura;
+import me.cleardragonf.com.registry.ModBlocks;
+import net.minecraft.data.PackOutput;
+import net.minecraftforge.client.model.generators.ItemModelProvider;
+import net.minecraftforge.common.data.ExistingFileHelper;
+
+public class ModItemModelProvider extends ItemModelProvider {
+    public ModItemModelProvider(PackOutput output, ExistingFileHelper existingFileHelper) {
+        super(output, Asura.MODID, existingFileHelper);
+    }
+
+    @Override
+    protected void registerModels() {
+
+    }
+}
