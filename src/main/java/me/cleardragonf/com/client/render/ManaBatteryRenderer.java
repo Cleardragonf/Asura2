@@ -19,7 +19,7 @@ import org.joml.Vector3f;
 public class ManaBatteryRenderer implements BlockEntityRenderer<ManaBatteryBlockEntity> {
     // Panel texture; can be replaced with a dedicated battery panel
     private static final ResourceLocation PANEL_TEX =
-            ResourceLocation.fromNamespaceAndPath(Asura.MODID, "textures/block/mana_generator.png");
+            ResourceLocation.fromNamespaceAndPath(Asura.MODID, "textures/block/mana_battery.png");
 
     public ManaBatteryRenderer(BlockEntityRendererProvider.Context ctx) {}
 
