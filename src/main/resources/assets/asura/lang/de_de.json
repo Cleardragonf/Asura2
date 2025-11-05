@@ -1,0 +1,10 @@
+{
+  "block.asura.mana_generator": "Mana Generator",
+  "block.asura.mana_ore": "Mana Erz",
+  "block.asura.deepslate_mana_ore": "Tiefenschiefer Mana Erz",
+  "block.asura.mana_battery": "Mana Batterie",
+  "block.asura.mana_relay": "Mana Relais",
+  "item.asura.linking_wand": "Verbindungsstab",
+  "item.asura.mana_shard": "Mana Splitter",
+  "itemGroup.asura.asura_tab": "Asura"
+}

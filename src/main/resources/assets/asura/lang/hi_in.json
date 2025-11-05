@@ -1,0 +1,10 @@
+{
+  "block.asura.mana_generator": "माना जनरेटर",
+  "block.asura.mana_ore": "माना अयस्क",
+  "block.asura.deepslate_mana_ore": "डीपस्लेट माना अयस्क",
+  "block.asura.mana_battery": "माना बैटरी",
+  "block.asura.mana_relay": "माना रिले",
+  "item.asura.linking_wand": "जोड़ने की छड़ी",
+  "item.asura.mana_shard": "माना टुकड़ा",
+  "itemGroup.asura.asura_tab": "Asura"
+}

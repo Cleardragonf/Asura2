@@ -1,0 +1,10 @@
+{
+  "block.asura.mana_generator": "Generador de Maná",
+  "block.asura.mana_ore": "Mena de Maná",
+  "block.asura.deepslate_mana_ore": "Mena de Maná de pizarra profunda",
+  "block.asura.mana_battery": "Batería de Maná",
+  "block.asura.mana_relay": "Relé de Maná",
+  "item.asura.linking_wand": "Varita de Enlace",
+  "item.asura.mana_shard": "Fragmento de Maná",
+  "itemGroup.asura.asura_tab": "Asura"
+}

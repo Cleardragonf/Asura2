@@ -1,0 +1,10 @@
+{
+  "block.asura.mana_generator": "Générateur de Mana",
+  "block.asura.mana_ore": "Minerai de Mana",
+  "block.asura.deepslate_mana_ore": "Minerai de Mana des abîmes",
+  "block.asura.mana_battery": "Batterie de Mana",
+  "block.asura.mana_relay": "Relais de Mana",
+  "item.asura.linking_wand": "Baguette de Liaison",
+  "item.asura.mana_shard": "Éclat de Mana",
+  "itemGroup.asura.asura_tab": "Asura"
+}
