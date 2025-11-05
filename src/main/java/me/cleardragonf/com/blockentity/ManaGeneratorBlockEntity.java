@@ -4,6 +4,7 @@ import me.cleardragonf.com.menu.ManaGeneratorMenu;
 import me.cleardragonf.com.registry.ModBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import me.cleardragonf.com.blockentity.ManaBatteryBlockEntity;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
@@ -43,9 +44,27 @@ public class ManaGeneratorBlockEntity extends BlockEntity implements MenuProvide
         mana += getManaPerTick(manaType);
         mana = Math.min(mana, 100);
 
+        if (mana > 0) {
+            mana -= pushToAdjacentBatteries(level, worldPosition, mana);
+        }
+
         data.set(0, mana);
         data.set(1, getManaTypeIndex());
         for (int i = 0; i < 6; i++) data.set(2 + i, elementCounts[i]);
+    }
+
+    private int pushToAdjacentBatteries(Level level, BlockPos pos, int available) {
+        int sent = 0;
+        for (Direction d : Direction.values()) {
+            if (available - sent <= 0) break;
+            BlockPos adj = pos.relative(d);
+            BlockEntity be = level.getBlockEntity(adj);
+            if (be instanceof ManaBatteryBlockEntity battery) {
+                int accepted = battery.addMana(available - sent);
+                sent += accepted;
+            }
+        }
+        return sent;
     }
 
     private void updateElements(Level level, BlockPos pos) {

@@ -4,6 +4,8 @@ import com.mojang.logging.LogUtils;
 import me.cleardragonf.com.data.Config;
 import me.cleardragonf.com.registry.*;
 import me.cleardragonf.com.screen.ManaGeneratorScreen;
+import me.cleardragonf.com.client.render.ManaBatteryRenderer;
+import me.cleardragonf.com.screen.ManaBatteryScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.core.registries.Registries;
@@ -61,6 +63,7 @@ public class Asura {
                         output.accept(me.cleardragonf.com.registry.ModBlocks.MANA_ORE_ITEM.get());
                         output.accept(me.cleardragonf.com.registry.ModBlocks.DEEPSLATE_MANA_ORE_ITEM.get());
                         output.accept(me.cleardragonf.com.registry.ModBlocks.MANA_GENERATOR_ITEM.get());
+                        output.accept(me.cleardragonf.com.registry.ModBlocks.MANA_BATTERY_ITEM.get());
                     })
                     .build());
 
@@ -108,9 +111,12 @@ public class Asura {
         public static void onClientSetup(FMLClientSetupEvent event) {
             event.enqueueWork(() -> {
                 MenuScreens.register(ModMenus.MANA_GENERATOR_MENU.get(), ManaGeneratorScreen::new);
+                MenuScreens.register(ModMenus.MANA_BATTERY_MENU.get(), ManaBatteryScreen::new);
+                net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(
+                        ModBlockEntities.MANA_BATTERY_ENTITY.get(), ManaBatteryRenderer::new);
             });
 
-            LOGGER.info("Mana Generator Screen registered successfully");
+            LOGGER.info("Mana Generator/Battery Screens registered successfully");
             LOGGER.info("Minecraft user: {}", Minecraft.getInstance().getUser().getName());
         }
     }

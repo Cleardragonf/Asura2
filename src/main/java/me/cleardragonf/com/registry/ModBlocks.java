@@ -1,6 +1,7 @@
 package me.cleardragonf.com.registry;
 
 import me.cleardragonf.com.Asura;
+import me.cleardragonf.com.block.ManaBatteryBlock;
 import me.cleardragonf.com.block.ManaGeneratorBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -31,6 +32,21 @@ public class ModBlocks {
     public static final RegistryObject<Item> MANA_GENERATOR_ITEM = ModItems.ITEMS.register(
             "mana_generator",
             () -> new BlockItem(MANA_GENERATOR.get(), new Item.Properties())
+    );
+
+    public static final RegistryObject<Block> MANA_BATTERY = BLOCKS.register(
+            "mana_battery",
+            () -> new ManaBatteryBlock(BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.COLOR_LIGHT_BLUE)
+                    .strength(2.0f, 6.0f)
+                    .sound(SoundType.METAL)
+                    .noOcclusion()
+                    .pushReaction(PushReaction.NORMAL))
+    );
+
+    public static final RegistryObject<Item> MANA_BATTERY_ITEM = ModItems.ITEMS.register(
+            "mana_battery",
+            () -> new BlockItem(MANA_BATTERY.get(), new Item.Properties())
     );
 
     // Mana Ore (overworld)

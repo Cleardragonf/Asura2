@@ -26,5 +26,15 @@ public class ModRecipeProvider extends RecipeProvider {
                 .define('A', ModItems.MANA_SHARD.get())
                 .unlockedBy(getHasName(ModItems.MANA_SHARD.get()), has(ModItems.MANA_SHARD.get()))
                 .save(output);
+
+        // Mana Battery: iron casing with a mana shard core
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModBlocks.MANA_BATTERY.get())
+                .pattern("III")
+                .pattern("ISI")
+                .pattern("III")
+                .define('I', net.minecraft.world.item.Items.IRON_INGOT)
+                .define('S', ModItems.MANA_SHARD.get())
+                .unlockedBy(getHasName(ModItems.MANA_SHARD.get()), has(ModItems.MANA_SHARD.get()))
+                .save(output);
     }
 }

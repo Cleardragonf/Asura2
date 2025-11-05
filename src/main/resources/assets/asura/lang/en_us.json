@@ -2,6 +2,7 @@
   "block.asura.mana_generator": "Mana Generator",
   "block.asura.mana_ore": "Mana Ore",
   "block.asura.deepslate_mana_ore": "Deepslate Mana Ore",
+  "block.asura.mana_battery": "Mana Battery",
   "item.asura.mana_shard": "Mana Shard",
   "itemGroup.asura.asura_tab": "Asura"
 }
