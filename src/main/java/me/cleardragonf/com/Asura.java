@@ -6,6 +6,7 @@ import me.cleardragonf.com.registry.*;
 import me.cleardragonf.com.screen.ManaGeneratorScreen;
 import me.cleardragonf.com.client.render.ManaBatteryRenderer;
 import me.cleardragonf.com.screen.ManaBatteryScreen;
+import me.cleardragonf.com.client.render.ManaRelayRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.core.registries.Registries;
@@ -116,9 +117,11 @@ public class Asura {
                 MenuScreens.register(ModMenus.MANA_BATTERY_MENU.get(), ManaBatteryScreen::new);
                 net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(
                         ModBlockEntities.MANA_BATTERY_ENTITY.get(), ManaBatteryRenderer::new);
+                net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(
+                        ModBlockEntities.MANA_RELAY_ENTITY.get(), ManaRelayRenderer::new);
             });
 
-            LOGGER.info("Mana Generator/Battery Screens registered successfully");
+            LOGGER.info("Mana Generator/Battery/Relay client setup complete");
             LOGGER.info("Minecraft user: {}", Minecraft.getInstance().getUser().getName());
         }
     }
