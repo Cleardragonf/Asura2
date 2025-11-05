@@ -18,6 +18,7 @@ public class ModBlockLootTableProvider extends BlockLootSubProvider {
     protected void generate() {
         dropSelf(ModBlocks.MANA_GENERATOR.get());
         dropSelf(ModBlocks.MANA_BATTERY.get());
+        dropSelf(ModBlocks.MANA_RELAY.get());
         add(ModBlocks.MANA_ORE.get(), createOreDrop(ModBlocks.MANA_ORE.get(), me.cleardragonf.com.registry.ModItems.MANA_SHARD.get()));
         add(ModBlocks.DEEPSLATE_MANA_ORE.get(), createOreDrop(ModBlocks.DEEPSLATE_MANA_ORE.get(), me.cleardragonf.com.registry.ModItems.MANA_SHARD.get()));
     }

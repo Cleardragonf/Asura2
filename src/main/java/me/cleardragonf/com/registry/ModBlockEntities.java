@@ -3,6 +3,7 @@ package me.cleardragonf.com.registry;
 import me.cleardragonf.com.Asura;
 import me.cleardragonf.com.blockentity.ManaBatteryBlockEntity;
 import me.cleardragonf.com.blockentity.ManaGeneratorBlockEntity;
+import me.cleardragonf.com.blockentity.ManaRelayBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -24,5 +25,12 @@ public class ModBlockEntities {
                     () -> BlockEntityType.Builder.of(
                             ManaBatteryBlockEntity::new,
                             ModBlocks.MANA_BATTERY.get()
+                    ).build(null));
+
+    public static final RegistryObject<BlockEntityType<ManaRelayBlockEntity>> MANA_RELAY_ENTITY =
+            BLOCK_ENTITIES.register("mana_relay_entity",
+                    () -> BlockEntityType.Builder.of(
+                            ManaRelayBlockEntity::new,
+                            ModBlocks.MANA_RELAY.get()
                     ).build(null));
 }

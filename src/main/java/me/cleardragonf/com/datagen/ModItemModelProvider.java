@@ -14,5 +14,8 @@ public class ModItemModelProvider extends ItemModelProvider {
     @Override
     protected void registerModels() {
         basicItem(ModItems.MANA_SHARD.get());
+        // Linking wand uses vanilla stick texture for now
+        withExistingParent(ModItems.LINKING_WAND.getId().getPath(), mcLoc("item/handheld"))
+                .texture("layer0", mcLoc("item/stick"));
     }
 }

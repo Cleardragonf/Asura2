@@ -3,6 +3,8 @@
   "block.asura.mana_ore": "Mana Ore",
   "block.asura.deepslate_mana_ore": "Deepslate Mana Ore",
   "block.asura.mana_battery": "Mana Battery",
+  "block.asura.mana_relay": "Mana Relay",
+  "item.asura.linking_wand": "Linking Wand",
   "item.asura.mana_shard": "Mana Shard",
   "itemGroup.asura.asura_tab": "Asura"
 }

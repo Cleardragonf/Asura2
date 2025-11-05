@@ -26,6 +26,7 @@ public class ManaGeneratorBlockEntity extends BlockEntity implements MenuProvide
 
     private int mana = 0;
     private String manaType = "None";
+    private double manaFraction = 0.0; // accumulates fractional mana per tick from wind
 
     // Sync container (2 slots: mana amount + mana type)
     private final ContainerData data = new SimpleContainerData(8); // mana + manaType + 6 elements
@@ -41,7 +42,17 @@ public class ManaGeneratorBlockEntity extends BlockEntity implements MenuProvide
 
         updateElements(level, worldPosition);
         manaType = getDominantElement();
-        mana += getManaPerTick(manaType);
+
+        // Wind-based generation: per-second = airBlocks / 10, per-tick = perSecond / 20
+        int airBlocks = elementCounts[5];
+        double perSecond = airBlocks / 10.0;
+        double perTick = perSecond / 20.0;
+        manaFraction += perTick;
+        if (manaFraction >= 1.0) {
+            int gain = (int) Math.floor(manaFraction);
+            mana += gain;
+            manaFraction -= gain;
+        }
         mana = Math.min(mana, 100);
 
         if (mana > 0) {
@@ -141,6 +152,15 @@ public class ManaGeneratorBlockEntity extends BlockEntity implements MenuProvide
 
     public int getMana() {
         return mana;
+    }
+
+    public int extractMana(int amount) {
+        if (amount <= 0) return 0;
+        int taken = Math.min(mana, amount);
+        if (taken > 0) {
+            mana -= taken;
+        }
+        return taken;
     }
 
     public String getManaType() {

@@ -20,6 +20,9 @@ public class ModBlockStateProvider extends BlockStateProvider {
         // Mana Battery uses a vanilla iron block texture as placeholder
         blockWithVanillaTexture(ModBlocks.MANA_BATTERY, "iron_block");
 
+        // Mana Relay placeholder visual
+        blockWithVanillaTexture(ModBlocks.MANA_RELAY, "redstone_block");
+
         // Use vanilla textures for placeholder visuals until custom textures are provided
         oreWithVanillaTexture(ModBlocks.MANA_ORE, "stone");
         oreWithVanillaTexture(ModBlocks.DEEPSLATE_MANA_ORE, "deepslate");

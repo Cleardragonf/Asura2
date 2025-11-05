@@ -64,6 +64,8 @@ public class Asura {
                         output.accept(me.cleardragonf.com.registry.ModBlocks.DEEPSLATE_MANA_ORE_ITEM.get());
                         output.accept(me.cleardragonf.com.registry.ModBlocks.MANA_GENERATOR_ITEM.get());
                         output.accept(me.cleardragonf.com.registry.ModBlocks.MANA_BATTERY_ITEM.get());
+                        output.accept(me.cleardragonf.com.registry.ModBlocks.MANA_RELAY_ITEM.get());
+                        output.accept(me.cleardragonf.com.registry.ModItems.LINKING_WAND.get());
                     })
                     .build());
 
