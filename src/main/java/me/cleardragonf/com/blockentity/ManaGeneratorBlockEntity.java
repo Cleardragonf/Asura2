@@ -33,7 +33,7 @@ public class ManaGeneratorBlockEntity extends BlockEntity implements MenuProvide
         super(ModBlockEntities.MANA_GENERATOR_ENTITY.get(), pos, state);
     }
 
-    private final boolean[] elements = new boolean[6]; // Light, Dark, Fire, Water, Earth, Air
+    private final int[] elementCounts = new int[6]; // Light, Dark, Fire, Water, Earth, Air
 
     public void tickServer() {
         if (level == null || level.isClientSide) return;
@@ -45,44 +45,44 @@ public class ManaGeneratorBlockEntity extends BlockEntity implements MenuProvide
 
         data.set(0, mana);
         data.set(1, getManaTypeIndex());
-        for (int i = 0; i < 6; i++) data.set(2 + i, elements[i] ? 1 : 0);
+        for (int i = 0; i < 6; i++) data.set(2 + i, elementCounts[i]);
     }
 
     private void updateElements(Level level, BlockPos pos) {
-        boolean foundLight = level.canSeeSky(pos.above()) && level.isDay();
-        boolean foundDark = !level.canSeeSky(pos) && !level.isDay();
-        boolean foundFire = scanForBlock(level, pos, Blocks.FIRE, Blocks.LAVA);
-        boolean foundWater = scanForBlock(level, pos, Blocks.WATER);
-        boolean foundEarth = scanForBlock(level, pos, Blocks.DIRT, Blocks.GRASS_BLOCK, Blocks.STONE);
-        boolean foundAir = scanForBlock(level, pos, Blocks.AIR);
+        // Reset
+        for (int i = 0; i < 6; i++) elementCounts[i] = 0;
 
-        elements[0] = foundLight;
-        elements[1] = foundDark;
-        elements[2] = foundFire;
-        elements[3] = foundWater;
-        elements[4] = foundEarth;
-        elements[5] = foundAir;
+        // Light/Dark as conditions (presence 0/1)
+        elementCounts[0] = (level.canSeeSky(pos.above()) && level.isDay()) ? 1 : 0; // Light
+        elementCounts[1] = (!level.canSeeSky(pos) && !level.isDay()) ? 1 : 0;        // Dark
+
+        // Count blocks in a 13x13x13 cube
+        elementCounts[2] = countBlocks(level, pos, Blocks.FIRE, Blocks.LAVA); // Fire
+        elementCounts[3] = countBlocks(level, pos, Blocks.WATER);              // Water
+        elementCounts[4] = countBlocks(level, pos, Blocks.DIRT, Blocks.GRASS_BLOCK, Blocks.STONE); // Earth
+        elementCounts[5] = countBlocks(level, pos, Blocks.AIR);                // Air
     }
 
-    private boolean scanForBlock(Level level, BlockPos origin, Block... targets) {
-        for (BlockPos pos : BlockPos.betweenClosed(origin.offset(-6, -6, -6), origin.offset(6, 6, 6))) {
-            Block b = level.getBlockState(pos).getBlock();
-            for (Block t : targets) if (b == t) return true;
+    private int countBlocks(Level level, BlockPos origin, Block... targets) {
+        int count = 0;
+        for (BlockPos p : BlockPos.betweenClosed(origin.offset(-6, -6, -6), origin.offset(6, 6, 6))) {
+            Block b = level.getBlockState(p).getBlock();
+            for (Block t : targets) {
+                if (b == t) { count++; break; }
+            }
         }
-        return false;
+        return count;
     }
 
     private String getDominantElement() {
-        if (elements[2]) return "Fire";
-        if (elements[3]) return "Water";
-        if (elements[0]) return "Light";
-        if (elements[1]) return "Dark";
-        if (elements[4]) return "Earth";
-        if (elements[5]) return "Air";
+        if (elementCounts[2] > 0) return "Fire";
+        if (elementCounts[3] > 0) return "Water";
+        if (elementCounts[0] > 0) return "Light";
+        if (elementCounts[1] > 0) return "Dark";
+        if (elementCounts[4] > 0) return "Earth";
+        if (elementCounts[5] > 0) return "Air";
         return "None";
     }
-
-    public boolean[] getElements() { return elements; }
 
     /** Determines the environment-based mana type */
     private String detectManaType(Level level, BlockPos pos) {

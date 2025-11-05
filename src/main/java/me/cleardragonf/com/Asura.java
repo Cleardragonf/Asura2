@@ -51,11 +51,17 @@ public class Asura {
             ITEMS.register("example_item", () -> new Item(new Item.Properties()
                     .food(new FoodProperties.Builder().alwaysEdible().nutrition(1).saturationModifier(2f).build())));
 
-    public static final RegistryObject<CreativeModeTab> EXAMPLE_TAB =
-            CREATIVE_MODE_TABS.register("example_tab", () -> CreativeModeTab.builder()
+    public static final RegistryObject<CreativeModeTab> ASURA_TAB =
+            CREATIVE_MODE_TABS.register("asura_tab", () -> CreativeModeTab.builder()
                     .withTabsBefore(CreativeModeTabs.COMBAT)
-                    .icon(() -> EXAMPLE_ITEM.get().getDefaultInstance())
-                    .displayItems((parameters, output) -> output.accept(EXAMPLE_ITEM.get()))
+                    .title(net.minecraft.network.chat.Component.translatable("itemGroup.asura.asura_tab"))
+                    .icon(() -> me.cleardragonf.com.registry.ModItems.MANA_SHARD.get().getDefaultInstance())
+                    .displayItems((parameters, output) -> {
+                        output.accept(me.cleardragonf.com.registry.ModItems.MANA_SHARD.get());
+                        output.accept(me.cleardragonf.com.registry.ModBlocks.MANA_ORE_ITEM.get());
+                        output.accept(me.cleardragonf.com.registry.ModBlocks.DEEPSLATE_MANA_ORE_ITEM.get());
+                        output.accept(me.cleardragonf.com.registry.ModBlocks.MANA_GENERATOR_ITEM.get());
+                    })
                     .build());
 
     public Asura() {
@@ -85,6 +91,7 @@ public class Asura {
     }
 
     private void addCreative(BuildCreativeModeTabContentsEvent event) {
+        // Keep example block in Building Blocks for now
         if (event.getTabKey() == CreativeModeTabs.BUILDING_BLOCKS)
             event.accept(EXAMPLE_BLOCK_ITEM);
     }

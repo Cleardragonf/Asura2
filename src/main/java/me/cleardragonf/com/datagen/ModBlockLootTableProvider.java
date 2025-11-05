@@ -3,15 +3,10 @@ package me.cleardragonf.com.datagen;
 import me.cleardragonf.com.registry.ModBlocks;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.loot.BlockLootSubProvider;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.flag.FeatureFlags;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraftforge.registries.RegistryObject;
 
-import java.util.Map;
 import java.util.Set;
 
 public class ModBlockLootTableProvider extends BlockLootSubProvider {
@@ -22,6 +17,8 @@ public class ModBlockLootTableProvider extends BlockLootSubProvider {
     @Override
     protected void generate() {
         dropSelf(ModBlocks.MANA_GENERATOR.get());
+        add(ModBlocks.MANA_ORE.get(), createOreDrop(ModBlocks.MANA_ORE.get(), me.cleardragonf.com.registry.ModItems.MANA_SHARD.get()));
+        add(ModBlocks.DEEPSLATE_MANA_ORE.get(), createOreDrop(ModBlocks.DEEPSLATE_MANA_ORE.get(), me.cleardragonf.com.registry.ModItems.MANA_SHARD.get()));
     }
 
     @Override

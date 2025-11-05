@@ -6,7 +6,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.SimpleContainerData;
-import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
@@ -43,9 +42,17 @@ public class ManaGeneratorMenu extends AbstractContainerMenu {
     public boolean[] getElements() {
         boolean[] elements = new boolean[6];
         for (int i = 0; i < 6; i++) {
-            elements[i] = data.get(2 + i) == 1;
+            elements[i] = data.get(2 + i) > 0;
         }
         return elements;
+    }
+
+    public int[] getElementCounts() {
+        int[] counts = new int[6];
+        for (int i = 0; i < 6; i++) {
+            counts[i] = data.get(2 + i);
+        }
+        return counts;
     }
 
     @Override

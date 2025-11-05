@@ -33,4 +33,32 @@ public class ModBlocks {
             () -> new BlockItem(MANA_GENERATOR.get(), new Item.Properties())
     );
 
+    // Mana Ore (overworld)
+    public static final RegistryObject<Block> MANA_ORE = BLOCKS.register(
+            "mana_ore",
+            () -> new Block(BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.STONE)
+                    .strength(3.0f, 3.0f)
+                    .sound(SoundType.STONE))
+    );
+
+    public static final RegistryObject<Item> MANA_ORE_ITEM = ModItems.ITEMS.register(
+            "mana_ore",
+            () -> new BlockItem(MANA_ORE.get(), new Item.Properties())
+    );
+
+    // Deepslate Mana Ore
+    public static final RegistryObject<Block> DEEPSLATE_MANA_ORE = BLOCKS.register(
+            "deepslate_mana_ore",
+            () -> new Block(BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.DEEPSLATE)
+                    .strength(4.5f, 3.0f)
+                    .sound(SoundType.DEEPSLATE))
+    );
+
+    public static final RegistryObject<Item> DEEPSLATE_MANA_ORE_ITEM = ModItems.ITEMS.register(
+            "deepslate_mana_ore",
+            () -> new BlockItem(DEEPSLATE_MANA_ORE.get(), new Item.Properties())
+    );
+
 }

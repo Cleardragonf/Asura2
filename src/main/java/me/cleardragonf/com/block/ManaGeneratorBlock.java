@@ -3,7 +3,6 @@ package me.cleardragonf.com.block;
 import com.mojang.serialization.MapCodec;
 import me.cleardragonf.com.blockentity.ManaGeneratorBlockEntity;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Player;

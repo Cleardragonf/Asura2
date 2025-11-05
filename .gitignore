@@ -36,3 +36,5 @@ logs/
 
 # Dependencies (optional)
 libs/
+run-data/config/fml.toml
+src/generated/*

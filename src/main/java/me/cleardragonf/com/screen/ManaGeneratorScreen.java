@@ -96,5 +96,38 @@ public class ManaGeneratorScreen extends AbstractContainerScreen<ManaGeneratorMe
         renderBackground(guiGraphics, mouseX, mouseY, delta);
         super.render(guiGraphics, mouseX, mouseY, delta);
         renderTooltip(guiGraphics, mouseX, mouseY);
+
+        // Custom tooltips for element icons with block counts
+        int x = (width - imageWidth) / 2;
+        int y = (height - imageHeight) / 2;
+        double centerX = x + imageWidth / 2.0 + CENTER_DX;
+        double centerY = y + imageHeight / 2.0 + CENTER_DY;
+
+        String[] names = {"light", "dark", "fire", "water", "earth", "air"};
+        String[] pretty = {"Light", "Dark", "Fire", "Water", "Earth", "Air"};
+        int[] counts = menu.getElementCounts();
+
+        double radius = 92.0;
+        double angleStep = 360.0 / names.length;
+        for (int i = 0; i < names.length; i++) {
+            double angleDeg = angleStep * i - 90;
+            double angleRad = Math.toRadians(angleDeg);
+            double iconCenterX = centerX + Math.cos(angleRad) * radius;
+            double iconCenterY = centerY + Math.sin(angleRad) * radius;
+
+            double left = iconCenterX - ICON_SIZE / 2.0;
+            double top = iconCenterY - ICON_SIZE / 2.0;
+            double right = left + ICON_SIZE;
+            double bottom = top + ICON_SIZE;
+
+            if (mouseX >= left && mouseX <= right && mouseY >= top && mouseY <= bottom) {
+                String label = pretty[i] + ": " + counts[i] + " blocks";
+                if (i == 0 || i == 1) {
+                    label = pretty[i] + (counts[i] > 0 ? ": active" : ": inactive");
+                }
+                guiGraphics.renderTooltip(this.font, net.minecraft.network.chat.Component.literal(label), mouseX, mouseY);
+                break;
+            }
+        }
     }
 }

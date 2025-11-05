@@ -16,9 +16,19 @@ public class ModBlockStateProvider extends BlockStateProvider {
     @Override
     protected void registerStatesAndModels() {
         blockWithItem(ModBlocks.MANA_GENERATOR);
+
+        // Use vanilla textures for placeholder visuals until custom textures are provided
+        oreWithVanillaTexture(ModBlocks.MANA_ORE, "stone");
+        oreWithVanillaTexture(ModBlocks.DEEPSLATE_MANA_ORE, "deepslate");
     }
 
     private void blockWithItem(RegistryObject<Block> blockRegistryObject){
         simpleBlockWithItem(blockRegistryObject.get(), cubeAll(blockRegistryObject.get()));
+    }
+
+    private void oreWithVanillaTexture(RegistryObject<Block> blockRegistryObject, String vanillaTextureName) {
+        String path = net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(blockRegistryObject.get()).getPath();
+        var model = models().cubeAll(path, mcLoc("block/" + vanillaTextureName));
+        simpleBlockWithItem(blockRegistryObject.get(), model);
     }
 }
