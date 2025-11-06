@@ -28,12 +28,33 @@ public class Config {
     // a list of strings that are treated as resource locations for items
     private static final ForgeConfigSpec.ConfigValue<List<? extends String>> ITEM_STRINGS = BUILDER.comment("A list of items to log on common setup.").defineListAllowEmpty("items", List.of("minecraft:iron_ingot"), Config::validateItemName);
 
+    // Vitals settings
+    public static final ForgeConfigSpec.IntValue TEMP_HYPO_THRESHOLD = BUILDER.comment("Temperature hypothermia threshold (-100..100)").defineInRange("vitals.tempHypoThreshold", -75, -100, 0);
+    public static final ForgeConfigSpec.IntValue TEMP_HYPER_THRESHOLD = BUILDER.comment("Temperature hyperthermia threshold (-100..100)").defineInRange("vitals.tempHyperThreshold", 75, 0, 100);
+    public static final ForgeConfigSpec.IntValue THIRST_DRAIN_INTERVAL = BUILDER.comment("Ticks between passive thirst drain").defineInRange("vitals.thirstDrainInterval", 80, 1, 1200);
+    public static final ForgeConfigSpec.IntValue THIRST_DRAIN_IDLE = BUILDER.comment("Passive thirst drain per interval when idle").defineInRange("vitals.thirstDrainIdle", 1, 0, 10);
+    public static final ForgeConfigSpec.IntValue THIRST_DRAIN_SPRINTING = BUILDER.comment("Passive thirst drain per interval when sprinting").defineInRange("vitals.thirstDrainSprinting", 2, 0, 10);
+    public static final ForgeConfigSpec.IntValue THIRST_GAIN_WATER = BUILDER.comment("Thirst gained from drinking a water bottle").defineInRange("vitals.thirstGainWater", 30, 0, 100);
+    public static final ForgeConfigSpec.IntValue THIRST_GAIN_MILK = BUILDER.comment("Thirst gained from drinking milk").defineInRange("vitals.thirstGainMilk", 15, 0, 100);
+    public static final ForgeConfigSpec.IntValue THIRST_GAIN_SOUP = BUILDER.comment("Thirst gained from eating soups/stews").defineInRange("vitals.thirstGainSoup", 12, 0, 100);
+    public static final ForgeConfigSpec.IntValue THIRST_GAIN_CANTEEN = BUILDER.comment("Thirst gained from drinking a canteen").defineInRange("vitals.thirstGainCanteen", 35, 0, 100);
+
     public static final ForgeConfigSpec SPEC = BUILDER.build();
 
     public static boolean logDirtBlock;
     public static int magicNumber;
     public static String magicNumberIntroduction;
     public static Set<Item> items;
+    // cached vitals config
+    public static int tempHypoThreshold;
+    public static int tempHyperThreshold;
+    public static int thirstDrainInterval;
+    public static int thirstDrainIdle;
+    public static int thirstDrainSprinting;
+    public static int thirstGainWater;
+    public static int thirstGainMilk;
+    public static int thirstGainSoup;
+    public static int thirstGainCanteen;
 
     private static boolean validateItemName(final Object obj) {
         return obj instanceof final String itemName && ForgeRegistries.ITEMS.containsKey(ResourceLocation.parse(itemName));
@@ -47,5 +68,15 @@ public class Config {
 
         // convert the list of strings into a set of items
         items = ITEM_STRINGS.get().stream().map(itemName -> ForgeRegistries.ITEMS.getValue(ResourceLocation.parse(itemName))).collect(Collectors.toSet());
+
+        tempHypoThreshold = TEMP_HYPO_THRESHOLD.get();
+        tempHyperThreshold = TEMP_HYPER_THRESHOLD.get();
+        thirstDrainInterval = THIRST_DRAIN_INTERVAL.get();
+        thirstDrainIdle = THIRST_DRAIN_IDLE.get();
+        thirstDrainSprinting = THIRST_DRAIN_SPRINTING.get();
+        thirstGainWater = THIRST_GAIN_WATER.get();
+        thirstGainMilk = THIRST_GAIN_MILK.get();
+        thirstGainSoup = THIRST_GAIN_SOUP.get();
+        thirstGainCanteen = THIRST_GAIN_CANTEEN.get();
     }
 }

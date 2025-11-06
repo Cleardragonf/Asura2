@@ -14,4 +14,7 @@ public class ModItems {
 
     public static final net.minecraftforge.registries.RegistryObject<Item> LINKING_WAND =
             ITEMS.register("linking_wand", () -> new me.cleardragonf.com.item.LinkingWandItem(new Item.Properties().stacksTo(1)));
+
+    public static final net.minecraftforge.registries.RegistryObject<Item> CANTEEN =
+            ITEMS.register("canteen", () -> new me.cleardragonf.com.item.CanteenItem(new Item.Properties().stacksTo(1)));
 }

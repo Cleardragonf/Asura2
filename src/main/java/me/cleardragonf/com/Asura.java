@@ -33,6 +33,7 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import org.slf4j.Logger;
+import me.cleardragonf.com.vitals.net.ModNetwork;
 
 @Mod(Asura.MODID)
 public class Asura {
@@ -69,6 +70,7 @@ public class Asura {
                         output.accept(me.cleardragonf.com.registry.ModBlocks.MANA_RELAY_ITEM.get());
                         output.accept(me.cleardragonf.com.registry.ModBlocks.MANA_CONVERTER_ITEM.get());
                         output.accept(me.cleardragonf.com.registry.ModItems.LINKING_WAND.get());
+                        output.accept(me.cleardragonf.com.registry.ModItems.CANTEEN.get());
                     })
                     .build());
 
@@ -96,6 +98,7 @@ public class Asura {
     private void commonSetup(final FMLCommonSetupEvent event) {
         LOGGER.info("HELLO FROM COMMON SETUP");
         LOGGER.info("DIRT BLOCK >> {}", ForgeRegistries.BLOCKS.getKey(Blocks.DIRT));
+        event.enqueueWork(ModNetwork::register);
     }
 
     private void addCreative(BuildCreativeModeTabContentsEvent event) {
