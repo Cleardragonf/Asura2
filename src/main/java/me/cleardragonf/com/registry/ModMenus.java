@@ -3,6 +3,7 @@ package me.cleardragonf.com.registry;
 import me.cleardragonf.com.menu.ManaBatteryMenu;
 import me.cleardragonf.com.menu.ManaConverterMenu;
 import me.cleardragonf.com.menu.ManaGeneratorMenu;
+import me.cleardragonf.com.menu.MagicCompendiumMenu;
 import me.cleardragonf.com.Asura;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.SimpleContainerData;
@@ -31,5 +32,11 @@ public class ModMenus {
             MENUS.register("mana_converter_menu",
                     () -> IForgeMenuType.create((windowId, inv, player) ->
                             new ManaConverterMenu(windowId, inv, null, new SimpleContainerData(2))
+                    ));
+
+    public static final RegistryObject<MenuType<MagicCompendiumMenu>> MAGIC_COMPENDIUM_MENU =
+            MENUS.register("magic_compendium_menu",
+                    () -> IForgeMenuType.create((windowId, inv, player) ->
+                            new MagicCompendiumMenu(windowId, inv)
                     ));
 }

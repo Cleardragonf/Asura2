@@ -4,6 +4,7 @@ import me.cleardragonf.com.Asura;
 import me.cleardragonf.com.block.ManaBatteryBlock;
 import me.cleardragonf.com.block.ManaRelayBlock;
 import me.cleardragonf.com.block.ManaGeneratorBlock;
+import me.cleardragonf.com.block.MagicCompendiumBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
@@ -107,6 +108,22 @@ public class ModBlocks {
     public static final RegistryObject<Item> MANA_CONVERTER_ITEM = ModItems.ITEMS.register(
             "mana_converter",
             () -> new BlockItem(MANA_CONVERTER.get(), new Item.Properties())
+    );
+
+    // Magic Compendium (spell programming station)
+    public static final RegistryObject<Block> MAGIC_COMPENDIUM = BLOCKS.register(
+            "magic_compendium",
+            () -> new MagicCompendiumBlock(BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.COLOR_PURPLE)
+                    .strength(2.0f, 6.0f)
+                    .sound(SoundType.AMETHYST)
+                    .noOcclusion()
+                    .pushReaction(PushReaction.NORMAL))
+    );
+
+    public static final RegistryObject<Item> MAGIC_COMPENDIUM_ITEM = ModItems.ITEMS.register(
+            "magic_compendium",
+            () -> new BlockItem(MAGIC_COMPENDIUM.get(), new Item.Properties())
     );
 
 }

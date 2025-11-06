@@ -7,6 +7,7 @@ import me.cleardragonf.com.screen.ManaGeneratorScreen;
 import me.cleardragonf.com.client.render.ManaBatteryRenderer;
 import me.cleardragonf.com.screen.ManaBatteryScreen;
 import me.cleardragonf.com.screen.ManaConverterScreen;
+import me.cleardragonf.com.screen.MagicCompendiumScreen;
 import me.cleardragonf.com.client.render.ManaRelayRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;
@@ -69,6 +70,8 @@ public class Asura {
                         output.accept(me.cleardragonf.com.registry.ModBlocks.MANA_RELAY_ITEM.get());
                         output.accept(me.cleardragonf.com.registry.ModBlocks.MANA_CONVERTER_ITEM.get());
                         output.accept(me.cleardragonf.com.registry.ModItems.LINKING_WAND.get());
+                        output.accept(me.cleardragonf.com.registry.ModItems.WAND.get());
+                        output.accept(me.cleardragonf.com.registry.ModBlocks.MAGIC_COMPENDIUM_ITEM.get());
                     })
                     .build());
 
@@ -84,6 +87,7 @@ public class Asura {
         ModItems.ITEMS.register(modEventBus);
         ModBlocks.BLOCKS.register(modEventBus);
         ModBlockEntities.BLOCK_ENTITIES.register(modEventBus);
+        ModEntityTypes.ENTITY_TYPES.register(modEventBus);
         ModMenus.MENUS.register(modEventBus);
 
         MinecraftForge.EVENT_BUS.register(this);
@@ -96,6 +100,8 @@ public class Asura {
     private void commonSetup(final FMLCommonSetupEvent event) {
         LOGGER.info("HELLO FROM COMMON SETUP");
         LOGGER.info("DIRT BLOCK >> {}", ForgeRegistries.BLOCKS.getKey(Blocks.DIRT));
+        me.cleardragonf.com.network.AsuraNetwork.register();
+        me.cleardragonf.com.spell.Spells.bootstrap();
     }
 
     private void addCreative(BuildCreativeModeTabContentsEvent event) {
@@ -118,10 +124,15 @@ public class Asura {
                 MenuScreens.register(ModMenus.MANA_GENERATOR_MENU.get(), ManaGeneratorScreen::new);
                 MenuScreens.register(ModMenus.MANA_BATTERY_MENU.get(), ManaBatteryScreen::new);
                 MenuScreens.register(ModMenus.MANA_CONVERTER_MENU.get(), ManaConverterScreen::new);
+                MenuScreens.register(ModMenus.MAGIC_COMPENDIUM_MENU.get(), MagicCompendiumScreen::new);
                 net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(
                         ModBlockEntities.MANA_BATTERY_ENTITY.get(), ManaBatteryRenderer::new);
                 net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(
                         ModBlockEntities.MANA_RELAY_ENTITY.get(), ManaRelayRenderer::new);
+                net.minecraft.client.renderer.entity.EntityRenderers.register(
+                        me.cleardragonf.com.registry.ModEntityTypes.SPELL_PROJECTILE.get(),
+                        ctx -> new net.minecraft.client.renderer.entity.NoopRenderer<>(ctx)
+                );
             });
 
             LOGGER.info("Mana Generator/Battery/Relay client setup complete");
