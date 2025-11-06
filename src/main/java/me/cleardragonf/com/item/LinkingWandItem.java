@@ -8,6 +8,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.block.entity.BlockEntity;
+
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -26,39 +27,60 @@ public class LinkingWandItem extends Item {
         UUID id = player.getUUID();
         Selection sel = Selection.STATE.computeIfAbsent(id, k -> new Selection());
 
+        // Generators clicked: select as source or add to pending relay inputs
         if (be instanceof ManaGeneratorBlockEntity) {
+            if (sel.pendingRelay != null) {
+                BlockEntity rbe = level.getBlockEntity(sel.pendingRelay);
+                if (rbe instanceof ManaRelayBlockEntity relay) {
+                    relay.addInput(pos);
+                    player.displayClientMessage(net.minecraft.network.chat.Component.literal("Added Generator → Relay input"), true);
+                    return InteractionResult.CONSUME;
+                }
+            }
             sel.source = pos;
-            sel.pendingRelay = null;
-            ctx.getPlayer().displayClientMessage(net.minecraft.network.chat.Component.literal("Selected Generator"), true);
+            player.displayClientMessage(net.minecraft.network.chat.Component.literal("Selected Generator as Source"), true);
             return InteractionResult.CONSUME;
         }
 
+        // Relays clicked: can be input source, or output target, or selection
         if (be instanceof ManaRelayBlockEntity) {
-            // If we have a selected generator, set it as source on this relay
+            ManaRelayBlockEntity clickedRelay = (ManaRelayBlockEntity) be;
+            // If we have a selected source (generator or relay), add it as input
             if (sel.source != null) {
-                ((ManaRelayBlockEntity) be).setSource(sel.source);
+                clickedRelay.addInput(sel.source);
                 sel.source = null;
                 sel.pendingRelay = pos;
-                ctx.getPlayer().displayClientMessage(net.minecraft.network.chat.Component.literal("Linked Source → Relay. Now select a Battery"), true);
-                return InteractionResult.CONSUME;
-            } else {
-                // No source pending: mark this relay as the one to set target
-                sel.pendingRelay = pos;
-                ctx.getPlayer().displayClientMessage(net.minecraft.network.chat.Component.literal("Selected Relay. Now click a Battery"), true);
+                player.displayClientMessage(net.minecraft.network.chat.Component.literal("Linked Input → Relay. Now select Output (Relay or Battery)"), true);
                 return InteractionResult.CONSUME;
             }
+            // If a different relay is pending, set that relay's output to this relay
+            if (sel.pendingRelay != null && !sel.pendingRelay.equals(pos)) {
+                BlockEntity from = level.getBlockEntity(sel.pendingRelay);
+                if (from instanceof ManaRelayBlockEntity r) {
+                    r.setOutput(pos);
+                    player.displayClientMessage(net.minecraft.network.chat.Component.literal("Set Relay Output → Relay"), true);
+                    sel.pendingRelay = null;
+                    return InteractionResult.CONSUME;
+                }
+            }
+            // Otherwise, select this relay to modify
+            sel.pendingRelay = pos;
+            player.displayClientMessage(net.minecraft.network.chat.Component.literal("Selected Relay. Click Generator/Relay to add input, or Battery/Relay to set output."), true);
+            return InteractionResult.CONSUME;
         }
 
+        // Batteries clicked: set output on pending relay
         if (be instanceof ManaBatteryBlockEntity) {
             if (sel.pendingRelay != null) {
                 BlockEntity rbe = level.getBlockEntity(sel.pendingRelay);
                 if (rbe instanceof ManaRelayBlockEntity relay) {
-                    relay.setTarget(pos);
+                    relay.setOutput(pos);
                     sel.pendingRelay = null;
-                    ctx.getPlayer().displayClientMessage(net.minecraft.network.chat.Component.literal("Linked Relay → Battery"), true);
+                    player.displayClientMessage(net.minecraft.network.chat.Component.literal("Set Relay Output → Battery"), true);
                     return InteractionResult.CONSUME;
                 }
             }
+            return InteractionResult.CONSUME;
         }
 
         return InteractionResult.PASS;
@@ -70,3 +92,4 @@ class Selection {
     public BlockPos pendingRelay;
     public static final ConcurrentHashMap<UUID, Selection> STATE = new ConcurrentHashMap<>();
 }
+

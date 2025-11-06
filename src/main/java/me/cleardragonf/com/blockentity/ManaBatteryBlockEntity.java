@@ -14,6 +14,7 @@ import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.ArrayDeque;
@@ -292,5 +293,14 @@ public class ManaBatteryBlockEntity extends BlockEntity implements net.minecraft
     // Compatibility with mappings that pass a Provider as well
     public void load(CompoundTag tag, net.minecraft.core.HolderLookup.Provider provider) {
         load(tag);
+    }
+
+    @Override
+    public AABB getRenderBoundingBox() {
+        // Ensure the renderer is not culled when drawing the cluster as one unit
+        if (maxX >= minX && maxY >= minY && maxZ >= minZ) {
+            return new AABB(minX, minY, minZ, maxX + 1, maxY + 1, maxZ + 1);
+        }
+        return super.getRenderBoundingBox();
     }
 }

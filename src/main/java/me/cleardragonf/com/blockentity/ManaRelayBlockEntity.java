@@ -3,6 +3,8 @@ package me.cleardragonf.com.blockentity;
 import me.cleardragonf.com.registry.ModBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import net.minecraft.server.level.ServerLevel;
@@ -11,10 +13,13 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class ManaRelayBlockEntity extends BlockEntity {
 
-    private BlockPos source; // ManaGenerator position
-    private BlockPos target; // Any ManaBattery block position (controller or member)
+    // Multiple inputs (generators or relays), single output (relay or battery)
+    private java.util.Set<BlockPos> inputs = new java.util.HashSet<>();
+    private BlockPos output;
 
     public static final int TRANSFER_PER_TICK = 50;
+    private static final int BUFFER_MAX = 10000;
+    private int buffer = 0; // stored mana waiting to be forwarded
 
     public ManaRelayBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.MANA_RELAY_ENTITY.get(), pos, state);
@@ -22,23 +27,57 @@ public class ManaRelayBlockEntity extends BlockEntity {
 
     public void serverTick() {
         if (level == null || level.isClientSide) return;
-        if (source == null || target == null) return;
 
-        BlockEntity sbe = level.getBlockEntity(source);
-        BlockEntity tbe = level.getBlockEntity(target);
-        if (!(sbe instanceof ManaGeneratorBlockEntity gen)) return;
-        if (!(tbe instanceof ManaBatteryBlockEntity bat)) return;
-
-        int available = gen.getMana();
-        if (available <= 0) return;
-        int toSend = Math.min(TRANSFER_PER_TICK, available);
-        int accepted = bat.addMana(toSend);
-        if (accepted > 0) {
-            gen.extractMana(accepted);
-            spawnBeamParticles(level, worldPosition, source);
-            spawnBeamParticles(level, worldPosition, target);
-            setChanged();
+        // Pull from inputs up to TRANSFER_PER_TICK into buffer
+        int pullBudget = Math.min(TRANSFER_PER_TICK, Math.max(0, BUFFER_MAX - buffer));
+        if (pullBudget > 0 && !inputs.isEmpty()) {
+            for (BlockPos in : new java.util.HashSet<>(inputs)) {
+                if (pullBudget <= 0) break;
+                BlockEntity sbe = level.getBlockEntity(in);
+                if (sbe instanceof ManaGeneratorBlockEntity gen) {
+                    int available = gen.getMana();
+                    if (available > 0) {
+                        int taken = Math.min(pullBudget, available);
+                        taken = gen.extractMana(taken);
+                        if (taken > 0) {
+                            buffer += taken;
+                            pullBudget -= taken;
+                            spawnBeamParticles(level, in, worldPosition);
+                        }
+                    }
+                } else if (sbe instanceof ManaRelayBlockEntity relay) {
+                    int taken = relay.pullFromBuffer(pullBudget);
+                    if (taken > 0) {
+                        buffer += taken;
+                        pullBudget -= taken;
+                        spawnBeamParticles(level, in, worldPosition);
+                    }
+                } else if (sbe == null) {
+                    // source unloaded/removed: keep it, user may fix later
+                }
+            }
         }
+
+        // Push from buffer to output up to TRANSFER_PER_TICK
+        if (buffer > 0 && output != null) {
+            int pushBudget = Math.min(TRANSFER_PER_TICK, buffer);
+            BlockEntity tbe = level.getBlockEntity(output);
+            if (tbe instanceof ManaBatteryBlockEntity bat) {
+                int accepted = bat.addMana(pushBudget);
+                if (accepted > 0) {
+                    buffer -= accepted;
+                    spawnBeamParticles(level, worldPosition, output);
+                }
+            } else if (tbe instanceof ManaRelayBlockEntity relay) {
+                int accepted = relay.receiveMana(pushBudget);
+                if (accepted > 0) {
+                    buffer -= accepted;
+                    spawnBeamParticles(level, worldPosition, output);
+                }
+            }
+        }
+
+        setChanged();
     }
 
     private void spawnBeamParticles(Level lvl, BlockPos from, BlockPos to) {
@@ -57,37 +96,85 @@ public class ManaRelayBlockEntity extends BlockEntity {
         }
     }
 
-    public void setSource(BlockPos pos) {
-        this.source = pos;
+    // Linking API
+    public void addInput(BlockPos pos) {
+        if (pos == null) return;
+        this.inputs.add(pos);
         setChanged();
         if (level != null) level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
     }
 
-    public void setTarget(BlockPos pos) {
-        this.target = pos;
+    public void removeInput(BlockPos pos) {
+        if (pos == null) return;
+        this.inputs.remove(pos);
+        setChanged();
+    }
+
+    public java.util.Set<BlockPos> getInputs() { return java.util.Collections.unmodifiableSet(inputs); }
+
+    public void setOutput(BlockPos pos) {
+        this.output = pos;
         setChanged();
         if (level != null) level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
     }
 
-    public BlockPos getSource() { return source; }
-    public BlockPos getTarget() { return target; }
+    public BlockPos getOutput() { return output; }
+
+    // Relay internal buffer API
+    public int receiveMana(int amount) {
+        if (amount <= 0) return 0;
+        int space = Math.max(0, BUFFER_MAX - buffer);
+        int accepted = Math.min(space, amount);
+        buffer += accepted;
+        return accepted;
+    }
+
+    public int pullFromBuffer(int amount) {
+        if (amount <= 0) return 0;
+        int taken = Math.min(buffer, amount);
+        buffer -= taken;
+        return taken;
+    }
 
     @Override
     protected void saveAdditional(CompoundTag tag, net.minecraft.core.HolderLookup.Provider provider) {
-        if (source != null) {
-            tag.putInt("sx", source.getX()); tag.putInt("sy", source.getY()); tag.putInt("sz", source.getZ());
+        // Back-compat single source (write first input if present)
+        if (!inputs.isEmpty()) {
+            BlockPos s = inputs.iterator().next();
+            tag.putInt("sx", s.getX()); tag.putInt("sy", s.getY()); tag.putInt("sz", s.getZ());
         }
-        if (target != null) {
-            tag.putInt("tx", target.getX()); tag.putInt("ty", target.getY()); tag.putInt("tz", target.getZ());
+        if (output != null) {
+            tag.putInt("tx", output.getX()); tag.putInt("ty", output.getY()); tag.putInt("tz", output.getZ());
         }
+        // New format: list of inputs
+        ListTag list = new ListTag();
+        for (BlockPos p : inputs) {
+            CompoundTag e = new CompoundTag();
+            e.putInt("x", p.getX()); e.putInt("y", p.getY()); e.putInt("z", p.getZ());
+            list.add(e);
+        }
+        tag.put("inputs", list);
+        tag.putInt("buffer", buffer);
     }
 
     public void load(CompoundTag tag) {
-        if (tag.contains("sx")) {
-            source = new BlockPos(tag.getInt("sx"), tag.getInt("sy"), tag.getInt("sz"));
+        inputs.clear();
+        if (tag.contains("inputs", Tag.TAG_LIST)) {
+            ListTag list = tag.getList("inputs", Tag.TAG_COMPOUND);
+            for (Tag t : list) {
+                if (t instanceof CompoundTag e) {
+                    inputs.add(new BlockPos(e.getInt("x"), e.getInt("y"), e.getInt("z")));
+                }
+            }
+        } else if (tag.contains("sx")) {
+            inputs.add(new BlockPos(tag.getInt("sx"), tag.getInt("sy"), tag.getInt("sz")));
         }
         if (tag.contains("tx")) {
-            target = new BlockPos(tag.getInt("tx"), tag.getInt("ty"), tag.getInt("tz"));
+            output = new BlockPos(tag.getInt("tx"), tag.getInt("ty"), tag.getInt("tz"));
+        } else {
+            output = null;
         }
+        buffer = tag.getInt("buffer");
+        buffer = Math.min(Math.max(buffer, 0), BUFFER_MAX);
     }
 }

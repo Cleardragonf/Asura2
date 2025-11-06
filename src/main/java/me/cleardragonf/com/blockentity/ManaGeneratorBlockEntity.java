@@ -4,7 +4,6 @@ import me.cleardragonf.com.menu.ManaGeneratorMenu;
 import me.cleardragonf.com.registry.ModBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import me.cleardragonf.com.blockentity.ManaBatteryBlockEntity;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
