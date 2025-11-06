@@ -18,19 +18,93 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.network.chat.Component;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ManaConverterBlockEntity extends BlockEntity implements ManaReceiver, MenuProvider {
 
-    private static final Map<Item, Integer> COSTS = new HashMap<>();
+    private static final Map<Item, Integer> BASE_COSTS = new HashMap<>();
+    private static final Map<Item, Integer> DERIVED_COST_CACHE = new ConcurrentHashMap<>();
+    private static final ThreadLocal<Set<Item>> COMPUTE_STACK = ThreadLocal.withInitial(HashSet::new);
     static {
-        // Example: diamond costs 5000 mana per duplicate
-        net.minecraft.world.item.Items items = null; // only to help IDE; we use Items.DIAMOND directly
-        COSTS.put(net.minecraft.world.item.Items.DIAMOND, 5000);
-        COSTS.put(net.minecraft.world.item.Items.EMERALD, 4000);
-        COSTS.put(net.minecraft.world.item.Items.IRON_INGOT, 250);
-        COSTS.put(net.minecraft.world.item.Items.GOLD_INGOT, 500);
+        // Baseline costs for common/base items, roughly by abundance/rarity
+        // Ores/ingots/gems
+        BASE_COSTS.put(Items.COAL, 120);
+        BASE_COSTS.put(Items.REDSTONE, 80);
+        BASE_COSTS.put(Items.LAPIS_LAZULI, 150);
+        BASE_COSTS.put(Items.COPPER_INGOT, 150);
+        BASE_COSTS.put(Items.IRON_INGOT, 250);
+        BASE_COSTS.put(Items.GOLD_INGOT, 500);
+        BASE_COSTS.put(Items.QUARTZ, 300);
+        BASE_COSTS.put(Items.EMERALD, 4000);
+        BASE_COSTS.put(Items.DIAMOND, 5000);
+        BASE_COSTS.put(Items.NETHERITE_INGOT, 20000);
+
+        // Stone/earth
+        BASE_COSTS.put(Items.STONE, 8);
+        BASE_COSTS.put(Items.COBBLESTONE, 6);
+        BASE_COSTS.put(Items.DEEPSLATE, 10);
+        BASE_COSTS.put(Items.ANDESITE, 8);
+        BASE_COSTS.put(Items.DIORITE, 8);
+        BASE_COSTS.put(Items.GRANITE, 8);
+        BASE_COSTS.put(Items.DIRT, 2);
+        BASE_COSTS.put(Items.GRASS_BLOCK, 4);
+        BASE_COSTS.put(Items.SAND, 4);
+        BASE_COSTS.put(Items.RED_SAND, 5);
+        BASE_COSTS.put(Items.GRAVEL, 4);
+        BASE_COSTS.put(Items.CLAY_BALL, 6);
+        BASE_COSTS.put(Items.SNOWBALL, 3);
+        BASE_COSTS.put(Items.ICE, 12);
+        BASE_COSTS.put(Items.NETHERRACK, 3);
+        BASE_COSTS.put(Items.BLACKSTONE, 12);
+        BASE_COSTS.put(Items.BASALT, 10);
+        BASE_COSTS.put(Items.END_STONE, 20);
+
+        // Logs (any overworld wood types roughly similar)
+        BASE_COSTS.put(Items.OAK_LOG, 12);
+        BASE_COSTS.put(Items.SPRUCE_LOG, 12);
+        BASE_COSTS.put(Items.BIRCH_LOG, 12);
+        BASE_COSTS.put(Items.JUNGLE_LOG, 12);
+        BASE_COSTS.put(Items.ACACIA_LOG, 12);
+        BASE_COSTS.put(Items.DARK_OAK_LOG, 12);
+        BASE_COSTS.put(Items.MANGROVE_LOG, 12);
+        BASE_COSTS.put(Items.CHERRY_LOG, 14);
+        // Nether woods
+        BASE_COSTS.put(Items.CRIMSON_STEM, 16);
+        BASE_COSTS.put(Items.WARPED_STEM, 16);
+
+        // Simple plants/foods
+        BASE_COSTS.put(Items.SUGAR_CANE, 6);
+        BASE_COSTS.put(Items.CACTUS, 6);
+        BASE_COSTS.put(Items.WHEAT_SEEDS, 2);
+        BASE_COSTS.put(Items.WHEAT, 10);
+        BASE_COSTS.put(Items.BEETROOT, 10);
+        BASE_COSTS.put(Items.CARROT, 12);
+        BASE_COSTS.put(Items.POTATO, 12);
+        BASE_COSTS.put(Items.SWEET_BERRIES, 8);
+        BASE_COSTS.put(Items.GLOW_BERRIES, 14);
+
+        // Fish
+        BASE_COSTS.put(Items.COD, 24);
+        BASE_COSTS.put(Items.SALMON, 28);
+        BASE_COSTS.put(Items.TROPICAL_FISH, 40);
+        BASE_COSTS.put(Items.PUFFERFISH, 50);
+
+        // Buckets (as base for fluids)
+        BASE_COSTS.put(Items.WATER_BUCKET, 150);
+        BASE_COSTS.put(Items.LAVA_BUCKET, 500);
+        BASE_COSTS.put(Items.MILK_BUCKET, 120);
+
+        // Mobs drops simple
+        BASE_COSTS.put(Items.STRING, 18);
+        BASE_COSTS.put(Items.FEATHER, 10);
+        BASE_COSTS.put(Items.LEATHER, 20);
+        BASE_COSTS.put(Items.BONE, 16);
+        BASE_COSTS.put(Items.ROTTEN_FLESH, 8);
+        BASE_COSTS.put(Items.SPIDER_EYE, 20);
+        BASE_COSTS.put(Items.GUNPOWDER, 30);
+        BASE_COSTS.put(Items.SLIME_BALL, 60);
+        BASE_COSTS.put(Items.ENDER_PEARL, 600);
     }
 
     private final SimpleContainer inventory = new SimpleContainer(2) {
@@ -38,7 +112,7 @@ public class ManaConverterBlockEntity extends BlockEntity implements ManaReceive
         public int getMaxStackSize() { return 64; }
         @Override
         public boolean canPlaceItem(int slot, ItemStack stack) {
-            if (slot == 0) return getCostFor(stack) > 0; // template only for known items
+            if (slot == 0) return ManaConverterBlockEntity.this.resolveCost(stack.getItem()) > 0; // template only for known items
             return false; // output not player-insertable
         }
         @Override
@@ -67,7 +141,7 @@ public class ManaConverterBlockEntity extends BlockEntity implements ManaReceive
         output = inventory.getItem(1);
 
         data.set(0, buffer);
-        int currentCost = getCostFor(input);
+        int currentCost = resolveCost(input.getItem());
         data.set(1, currentCost);
 
         if (input.isEmpty() || currentCost <= 0) return;
@@ -105,6 +179,12 @@ public class ManaConverterBlockEntity extends BlockEntity implements ManaReceive
 
     public ContainerData getContainerData() { return data; }
     public SimpleContainer getInventory() { return inventory; }
+
+    // Public helper for menus/UI
+    public int getCostFor(ItemStack stack) {
+        if (stack == null || stack.isEmpty()) return 0;
+        return resolveCost(stack.getItem());
+    }
 
     @Override
     protected void saveAdditional(CompoundTag tag, net.minecraft.core.HolderLookup.Provider provider) {
@@ -212,31 +292,41 @@ public class ManaConverterBlockEntity extends BlockEntity implements ManaReceive
     }
 
     // ---- Costs ----
-    public static int getCostFor(ItemStack stack) {
-        if (stack == null || stack.isEmpty()) return 0;
-        return getCostFor(stack.getItem());
+    public int resolveCost(Item item) {
+        if (item == null) return 0;
+        // 1) Direct base cost
+        Integer base = BASE_COSTS.get(item);
+        if (base != null) return base;
+
+        // 2) Cached derived
+        Integer cached = DERIVED_COST_CACHE.get(item);
+        if (cached != null) return cached;
+
+        // 3) Known block compressions (fallback if no recipes cover it)
+        if (item == Items.DIAMOND_BLOCK) return cache(item, scaleBlock(Items.DIAMOND));
+        if (item == Items.EMERALD_BLOCK) return cache(item, scaleBlock(Items.EMERALD));
+        if (item == Items.GOLD_BLOCK) return cache(item, scaleBlock(Items.GOLD_INGOT));
+        if (item == Items.IRON_BLOCK) return cache(item, scaleBlock(Items.IRON_INGOT));
+        if (item == Items.COPPER_BLOCK) return cache(item, scaleBlock(Items.COPPER_INGOT));
+        if (item == Items.REDSTONE_BLOCK) return cache(item, scaleBlock(Items.REDSTONE));
+        if (item == Items.LAPIS_BLOCK) return cache(item, scaleBlock(Items.LAPIS_LAZULI));
+        if (item == Items.COAL_BLOCK) return cache(item, scaleBlock(Items.COAL));
+        if (item == Items.QUARTZ_BLOCK) return cache(item, scaleBlock(Items.QUARTZ));
+        if (item == Items.NETHERITE_BLOCK) return cache(item, scaleBlock(Items.NETHERITE_INGOT));
+
+        // 4) Derive via recipes (choose cheapest among all applicable recipes)
+        int viaRecipe = deriveFromRecipes(item);
+        return cache(item, viaRecipe);
     }
 
-    public static int getCostFor(Item item) {
-        Integer base = COSTS.get(item);
-        if (base != null) return base;
-        // Derive from known 9x block forms
-        var I = net.minecraft.world.item.Items.class;
-        if (item == net.minecraft.world.item.Items.DIAMOND_BLOCK) return scaleBlock(net.minecraft.world.item.Items.DIAMOND);
-        if (item == net.minecraft.world.item.Items.EMERALD_BLOCK) return scaleBlock(net.minecraft.world.item.Items.EMERALD);
-        if (item == net.minecraft.world.item.Items.GOLD_BLOCK) return scaleBlock(net.minecraft.world.item.Items.GOLD_INGOT);
-        if (item == net.minecraft.world.item.Items.IRON_BLOCK) return scaleBlock(net.minecraft.world.item.Items.IRON_INGOT);
-        if (item == net.minecraft.world.item.Items.COPPER_BLOCK) return scaleBlock(net.minecraft.world.item.Items.COPPER_INGOT);
-        if (item == net.minecraft.world.item.Items.REDSTONE_BLOCK) return scaleBlock(net.minecraft.world.item.Items.REDSTONE);
-        if (item == net.minecraft.world.item.Items.LAPIS_BLOCK) return scaleBlock(net.minecraft.world.item.Items.LAPIS_LAZULI);
-        if (item == net.minecraft.world.item.Items.COAL_BLOCK) return scaleBlock(net.minecraft.world.item.Items.COAL);
-        if (item == net.minecraft.world.item.Items.QUARTZ_BLOCK) return scaleBlock(net.minecraft.world.item.Items.QUARTZ);
-        if (item == net.minecraft.world.item.Items.NETHERITE_BLOCK) return scaleBlock(net.minecraft.world.item.Items.NETHERITE_INGOT);
-        return 0;
+    private int cache(Item item, int value) {
+        if (value <= 0) return 0;
+        DERIVED_COST_CACHE.put(item, value);
+        return value;
     }
 
     private static int scaleBlock(Item baseItem) {
-        int base = COSTS.getOrDefault(baseItem, 0);
+        int base = BASE_COSTS.getOrDefault(baseItem, 0);
         if (base <= 0) return 0;
         // 9x for composition with a rarity multiplier
         int rarityMul = rarityMultiplier(new ItemStack(baseItem).getRarity());
@@ -250,5 +340,100 @@ public class ManaConverterBlockEntity extends BlockEntity implements ManaReceive
         if (r == net.minecraft.world.item.Rarity.RARE) return 150;
         if (r == net.minecraft.world.item.Rarity.UNCOMMON) return 120;
         return 100;
+    }
+
+    private int deriveFromRecipes(Item target) {
+        if (level == null || level.isClientSide) return 0;
+        if (!(level instanceof net.minecraft.server.level.ServerLevel serverLevel)) return 0;
+
+        // Cycle guard
+        Set<Item> stack = COMPUTE_STACK.get();
+        if (stack.contains(target)) return 0;
+        stack.add(target);
+        try {
+            var access = serverLevel.registryAccess();
+            var manager = serverLevel.getRecipeManager();
+            int best = Integer.MAX_VALUE;
+
+            // Iterate all recipes and filter by result item
+            for (var holder : manager.getRecipes()) {
+                var recipe = holder.value();
+                ItemStack result = recipe.getResultItem(access);
+                if (result.isEmpty() || result.getItem() != target) continue;
+
+                int outCount = Math.max(1, result.getCount());
+                int cost = costForIngredients(recipe);
+                cost += processingOverhead(recipe, result);
+                if (cost <= 0) continue;
+                int perUnit = (int) Math.ceil(cost / (double) outCount);
+                if (perUnit > 0 && perUnit < best) best = perUnit;
+            }
+
+            return best == Integer.MAX_VALUE ? 0 : best;
+        } finally {
+            stack.remove(target);
+        }
+    }
+
+    private int costForIngredients(net.minecraft.world.item.crafting.Recipe<?> recipe) {
+        // Generic path: sum minimal cost among item options for each ingredient slot
+        int total = 0;
+        var ingredients = recipe.getIngredients();
+        if (ingredients == null || ingredients.isEmpty()) return 0;
+
+        for (var ing : ingredients) {
+            if (ing.isEmpty()) continue; // shaped recipes include empties
+            int best = Integer.MAX_VALUE;
+            for (ItemStack option : ing.getItems()) {
+                if (option.isEmpty()) continue;
+                int c = resolveCost(option.getItem());
+                if (c > 0 && c < best) best = c;
+            }
+            if (best == Integer.MAX_VALUE) return 0; // unknown ingredient => cannot price
+            total += best;
+        }
+
+        // Special handling for smithing-like recipes (base + addition) already covered via ingredients
+        // Cooking/stonecutting are also handled since they expose a single ingredient.
+        return total;
+    }
+
+    private int processingOverhead(net.minecraft.world.item.crafting.Recipe<?> recipe, ItemStack result) {
+        if (recipe == null) return 0;
+        var type = recipe.getType();
+        int outCount = Math.max(1, result == null ? 1 : result.getCount());
+
+        // Baseline fuel reference: assume coal at 1600 ticks
+        int coalCost = BASE_COSTS.getOrDefault(net.minecraft.world.item.Items.COAL, 120);
+        double perTickFuelCost = coalCost / 1600.0;
+
+        // Cooking: add fuel proportional to cooking time
+        try {
+            if (recipe instanceof net.minecraft.world.item.crafting.AbstractCookingRecipe cooking) {
+                int t = Math.max(1, cooking.getCookingTime());
+                int fuel = (int) Math.ceil(perTickFuelCost * t);
+                // minimal handling cost so very cheap inputs still get some cost
+                int handling = Math.max(0, (int)Math.ceil(0.02 * BASE_COSTS.getOrDefault(result.getItem(), 0)));
+                return Math.max(1, fuel + handling);
+            }
+        } catch (Throwable ignored) {}
+
+        // Stonecutting: small flat per-operation overhead
+        try {
+            if (type == net.minecraft.world.item.crafting.RecipeType.STONECUTTING) {
+                int overhead = 10; // light processing cost
+                return overhead;
+            }
+        } catch (Throwable ignored) {}
+
+        // Smithing: higher overhead to reflect tool/template usage
+        try {
+            if (type == net.minecraft.world.item.crafting.RecipeType.SMITHING) {
+                int overhead = 100; // significant processing/consumable wear
+                return overhead;
+            }
+        } catch (Throwable ignored) {}
+
+        return 0;
     }
 }
