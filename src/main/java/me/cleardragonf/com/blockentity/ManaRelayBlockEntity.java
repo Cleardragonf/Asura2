@@ -1,6 +1,7 @@
 package me.cleardragonf.com.blockentity;
 
 import me.cleardragonf.com.registry.ModBlockEntities;
+import me.cleardragonf.com.api.ManaReceiver;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.ListTag;
@@ -62,14 +63,8 @@ public class ManaRelayBlockEntity extends BlockEntity {
         if (buffer > 0 && output != null) {
             int pushBudget = Math.min(TRANSFER_PER_TICK, buffer);
             BlockEntity tbe = level.getBlockEntity(output);
-            if (tbe instanceof ManaBatteryBlockEntity bat) {
-                int accepted = bat.addMana(pushBudget);
-                if (accepted > 0) {
-                    buffer -= accepted;
-                    spawnBeamParticles(level, worldPosition, output);
-                }
-            } else if (tbe instanceof ManaRelayBlockEntity relay) {
-                int accepted = relay.receiveMana(pushBudget);
+            if (tbe instanceof ManaReceiver sink) {
+                int accepted = sink.receiveMana(pushBudget);
                 if (accepted > 0) {
                     buffer -= accepted;
                     spawnBeamParticles(level, worldPosition, output);
@@ -176,5 +171,28 @@ public class ManaRelayBlockEntity extends BlockEntity {
         }
         buffer = tag.getInt("buffer");
         buffer = Math.min(Math.max(buffer, 0), BUFFER_MAX);
+        setChanged();
+    }
+
+    // Preferred signature (provider unused but matches 1.21 loader)
+    public void load(CompoundTag tag, net.minecraft.core.HolderLookup.Provider provider) {
+        load(tag);
+    }
+
+    // Some loader/mapping paths call this in 1.21+
+    @Override
+    protected void loadAdditional(CompoundTag tag, net.minecraft.core.HolderLookup.Provider provider) {
+        load(tag);
+    }
+
+    // Networking for client sync
+    public net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket getUpdatePacket() {
+        return net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket.create(this);
+    }
+
+    public CompoundTag getUpdateTag() {
+        CompoundTag tag = new CompoundTag();
+        saveAdditional(tag, null);
+        return tag;
     }
 }

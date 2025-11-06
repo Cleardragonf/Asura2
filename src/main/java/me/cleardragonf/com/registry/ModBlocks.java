@@ -93,4 +93,20 @@ public class ModBlocks {
             () -> new BlockItem(DEEPSLATE_MANA_ORE.get(), new Item.Properties())
     );
 
+    // Mana Matter Converter
+    public static final RegistryObject<Block> MANA_CONVERTER = BLOCKS.register(
+            "mana_converter",
+            () -> new me.cleardragonf.com.block.ManaConverterBlock(BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.COLOR_LIGHT_BLUE)
+                    .strength(2.5f, 6.0f)
+                    .sound(SoundType.METAL)
+                    .noOcclusion()
+                    .pushReaction(PushReaction.NORMAL))
+    );
+
+    public static final RegistryObject<Item> MANA_CONVERTER_ITEM = ModItems.ITEMS.register(
+            "mana_converter",
+            () -> new BlockItem(MANA_CONVERTER.get(), new Item.Properties())
+    );
+
 }

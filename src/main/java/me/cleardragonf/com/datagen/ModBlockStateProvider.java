@@ -27,6 +27,9 @@ public class ModBlockStateProvider extends BlockStateProvider {
         // Ores: use mod textures
         blockWithModTexture(ModBlocks.MANA_ORE);
         blockWithModTexture(ModBlocks.DEEPSLATE_MANA_ORE);
+
+        // Mana Converter: use generator texture until a dedicated one is provided
+        blockWithExplicitTexture(ModBlocks.MANA_CONVERTER, modLoc("block/mana_generator"));
     }
 
     private void blockWithItem(RegistryObject<Block> blockRegistryObject){
@@ -56,5 +59,11 @@ public class ModBlockStateProvider extends BlockStateProvider {
         ModelFile empty = models().getBuilder(name)
                 .texture("particle", particleTex);
         simpleBlock(blockRegistryObject.get(), empty);
+    }
+
+    private void blockWithExplicitTexture(RegistryObject<Block> blockRegistryObject, net.minecraft.resources.ResourceLocation texture) {
+        String path = net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(blockRegistryObject.get()).getPath();
+        var model = models().cubeAll(path, texture);
+        simpleBlockWithItem(blockRegistryObject.get(), model);
     }
 }

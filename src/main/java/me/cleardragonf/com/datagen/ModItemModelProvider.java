@@ -24,5 +24,6 @@ public class ModItemModelProvider extends ItemModelProvider {
         withExistingParent("mana_generator", mcLoc("item/generated")).texture("layer0", modLoc("block/mana_generator"));
         withExistingParent("mana_battery", mcLoc("item/generated")).texture("layer0", modLoc("block/mana_battery"));
         withExistingParent("mana_relay", mcLoc("item/generated")).texture("layer0", modLoc("block/mana_relay"));
+        withExistingParent("mana_converter", mcLoc("item/generated")).texture("layer0", modLoc("block/mana_generator"));
     }
 }

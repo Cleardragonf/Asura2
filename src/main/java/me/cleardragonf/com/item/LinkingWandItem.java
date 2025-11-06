@@ -69,14 +69,14 @@ public class LinkingWandItem extends Item {
             return InteractionResult.CONSUME;
         }
 
-        // Batteries clicked: set output on pending relay
-        if (be instanceof ManaBatteryBlockEntity) {
+        // Receivers clicked (battery, converter, etc.): set output on pending relay
+        if (be instanceof me.cleardragonf.com.api.ManaReceiver) {
             if (sel.pendingRelay != null) {
                 BlockEntity rbe = level.getBlockEntity(sel.pendingRelay);
                 if (rbe instanceof ManaRelayBlockEntity relay) {
                     relay.setOutput(pos);
                     sel.pendingRelay = null;
-                    player.displayClientMessage(net.minecraft.network.chat.Component.literal("Set Relay Output → Battery"), true);
+                    player.displayClientMessage(net.minecraft.network.chat.Component.literal("Set Relay Output → Target"), true);
                     return InteractionResult.CONSUME;
                 }
             }
@@ -92,4 +92,3 @@ class Selection {
     public BlockPos pendingRelay;
     public static final ConcurrentHashMap<UUID, Selection> STATE = new ConcurrentHashMap<>();
 }
-

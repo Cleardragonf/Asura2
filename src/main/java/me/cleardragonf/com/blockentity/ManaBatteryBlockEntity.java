@@ -1,5 +1,6 @@
 package me.cleardragonf.com.blockentity;
 
+import me.cleardragonf.com.api.ManaReceiver;
 import me.cleardragonf.com.block.ManaBatteryBlock;
 import me.cleardragonf.com.menu.ManaBatteryMenu;
 import me.cleardragonf.com.registry.ModBlockEntities;
@@ -21,7 +22,7 @@ import java.util.ArrayDeque;
 import java.util.HashSet;
 import java.util.Set;
 
-public class ManaBatteryBlockEntity extends BlockEntity implements net.minecraft.world.MenuProvider {
+public class ManaBatteryBlockEntity extends BlockEntity implements net.minecraft.world.MenuProvider, ManaReceiver {
 
     public static final int CAPACITY_PER_BLOCK = 1000; // increased per request
 
@@ -195,6 +196,11 @@ public class ManaBatteryBlockEntity extends BlockEntity implements net.minecraft
             c.setChanged();
         }
         return accepted;
+    }
+
+    @Override
+    public int receiveMana(int amount) {
+        return addMana(amount);
     }
 
     public int extractMana(int amount) {

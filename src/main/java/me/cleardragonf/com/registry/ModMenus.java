@@ -1,6 +1,7 @@
 package me.cleardragonf.com.registry;
 
 import me.cleardragonf.com.menu.ManaBatteryMenu;
+import me.cleardragonf.com.menu.ManaConverterMenu;
 import me.cleardragonf.com.menu.ManaGeneratorMenu;
 import me.cleardragonf.com.Asura;
 import net.minecraft.world.inventory.MenuType;
@@ -24,5 +25,11 @@ public class ModMenus {
             MENUS.register("mana_battery_menu",
                     () -> IForgeMenuType.create((windowId, inv, player) ->
                             new ManaBatteryMenu(windowId, inv, null, new SimpleContainerData(2))
+                    ));
+
+    public static final RegistryObject<MenuType<ManaConverterMenu>> MANA_CONVERTER_MENU =
+            MENUS.register("mana_converter_menu",
+                    () -> IForgeMenuType.create((windowId, inv, player) ->
+                            new ManaConverterMenu(windowId, inv, null, new SimpleContainerData(2))
                     ));
 }

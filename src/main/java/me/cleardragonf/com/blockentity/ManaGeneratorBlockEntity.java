@@ -5,6 +5,7 @@ import me.cleardragonf.com.registry.ModBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -168,6 +169,25 @@ public class ManaGeneratorBlockEntity extends BlockEntity implements MenuProvide
 
     public ContainerData getContainerData() {
         return data;
+    }
+
+    // ---- NBT Persistence ----
+    @Override
+    protected void saveAdditional(CompoundTag tag, net.minecraft.core.HolderLookup.Provider provider) {
+        tag.putInt("Mana", mana);
+        tag.putDouble("ManaFrac", manaFraction);
+        tag.putString("ManaType", manaType);
+    }
+
+    public void load(CompoundTag tag) {
+        if (tag.contains("Mana")) this.mana = tag.getInt("Mana");
+        if (tag.contains("ManaFrac")) this.manaFraction = tag.getDouble("ManaFrac");
+        if (tag.contains("ManaType")) this.manaType = tag.getString("ManaType");
+    }
+
+    // 1.21 preferred signature
+    public void load(CompoundTag tag, net.minecraft.core.HolderLookup.Provider provider) {
+        load(tag);
     }
 
     @Override

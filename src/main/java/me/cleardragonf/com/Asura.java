@@ -6,6 +6,7 @@ import me.cleardragonf.com.registry.*;
 import me.cleardragonf.com.screen.ManaGeneratorScreen;
 import me.cleardragonf.com.client.render.ManaBatteryRenderer;
 import me.cleardragonf.com.screen.ManaBatteryScreen;
+import me.cleardragonf.com.screen.ManaConverterScreen;
 import me.cleardragonf.com.client.render.ManaRelayRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;
@@ -66,6 +67,7 @@ public class Asura {
                         output.accept(me.cleardragonf.com.registry.ModBlocks.MANA_GENERATOR_ITEM.get());
                         output.accept(me.cleardragonf.com.registry.ModBlocks.MANA_BATTERY_ITEM.get());
                         output.accept(me.cleardragonf.com.registry.ModBlocks.MANA_RELAY_ITEM.get());
+                        output.accept(me.cleardragonf.com.registry.ModBlocks.MANA_CONVERTER_ITEM.get());
                         output.accept(me.cleardragonf.com.registry.ModItems.LINKING_WAND.get());
                     })
                     .build());
@@ -115,6 +117,7 @@ public class Asura {
             event.enqueueWork(() -> {
                 MenuScreens.register(ModMenus.MANA_GENERATOR_MENU.get(), ManaGeneratorScreen::new);
                 MenuScreens.register(ModMenus.MANA_BATTERY_MENU.get(), ManaBatteryScreen::new);
+                MenuScreens.register(ModMenus.MANA_CONVERTER_MENU.get(), ManaConverterScreen::new);
                 net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(
                         ModBlockEntities.MANA_BATTERY_ENTITY.get(), ManaBatteryRenderer::new);
                 net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(
