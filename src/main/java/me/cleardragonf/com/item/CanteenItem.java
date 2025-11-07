@@ -26,15 +26,18 @@ public class CanteenItem extends Item {
     }
 
     public static boolean isFilled(ItemStack stack) {
-        return stack.getOrCreateTag().getBoolean(TAG_FILLED);
+        net.minecraft.nbt.CompoundTag tag = me.cleardragonf.com.util.ItemData.getOrCreate(stack);
+        return tag.getBoolean(TAG_FILLED);
     }
 
     public static void setFilled(ItemStack stack, boolean filled) {
-        stack.getOrCreateTag().putBoolean(TAG_FILLED, filled);
+        net.minecraft.nbt.CompoundTag tag = me.cleardragonf.com.util.ItemData.getOrCreate(stack);
+        tag.putBoolean(TAG_FILLED, filled);
+        me.cleardragonf.com.util.ItemData.set(stack, tag);
     }
 
     @Override
-    public int getUseDuration(ItemStack stack, Player player) {
+    public int getUseDuration(ItemStack stack, net.minecraft.world.entity.LivingEntity entity) {
         return 24;
     }
 

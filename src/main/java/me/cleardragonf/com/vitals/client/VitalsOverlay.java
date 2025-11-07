@@ -8,30 +8,30 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
-import net.minecraftforge.client.gui.overlay.IGuiOverlay;
+import net.minecraftforge.client.event.CustomizeGuiOverlayEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-@Mod.EventBusSubscriber(modid = Asura.MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+@Mod.EventBusSubscriber(modid = Asura.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class VitalsOverlay {
 
-    public static final IGuiOverlay OVERLAY = (gui, guiGraphics, partialTick, width, height) -> {
+    @SubscribeEvent
+    public static void onHud(CustomizeGuiOverlayEvent event) {
         var mc = Minecraft.getInstance();
         var player = mc.player;
         if (player == null || player.isSpectator()) return;
 
+        var g = event.getGuiGraphics();
+        var win = event.getWindow();
+        int width = win.getGuiScaledWidth();
+        int height = win.getGuiScaledHeight();
+
         player.getCapability(PlayerVitalsProvider.VITALS_CAPABILITY).ifPresent(v -> {
             int x = 10;
             int y = height - 50;
-            drawThirstBar(guiGraphics, x, y, v);
-            drawTempBar(guiGraphics, x, y - 12, v);
+            drawThirstBar(g, x, y, v);
+            drawTempBar(g, x, y - 12, v);
         });
-    };
-
-    @SubscribeEvent
-    public static void registerOverlays(RegisterGuiOverlaysEvent event) {
-        event.registerAboveAll("asura_vitals", OVERLAY);
     }
 
     private static void drawThirstBar(GuiGraphics g, int x, int y, IPlayerVitals v) {

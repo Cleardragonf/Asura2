@@ -4,7 +4,7 @@ import me.cleardragonf.com.vitals.PlayerVitalsProvider;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.network.NetworkEvent;
+import net.minecraftforge.event.network.CustomPayloadEvent;
 
 import java.util.function.Supplier;
 
@@ -28,8 +28,8 @@ public class VitalsSyncPacket {
         return new VitalsSyncPacket(t, h);
     }
 
-    public static void handle(VitalsSyncPacket pkt, Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> {
+    public static void handle(VitalsSyncPacket pkt, CustomPayloadEvent.Context ctx) {
+        ctx.enqueueWork(() -> {
             Player player = Minecraft.getInstance().player;
             if (player == null) return;
             player.getCapability(PlayerVitalsProvider.VITALS_CAPABILITY).ifPresent(v -> {
@@ -37,7 +37,7 @@ public class VitalsSyncPacket {
                 v.setThirst(pkt.thirst);
             });
         });
-        ctx.get().setPacketHandled(true);
+        ctx.setPacketHandled(true);
     }
 }
 

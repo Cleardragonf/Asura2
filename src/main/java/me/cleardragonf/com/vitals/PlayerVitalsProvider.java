@@ -1,6 +1,7 @@
 package me.cleardragonf.com.vitals;
 
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
@@ -18,7 +19,7 @@ public class PlayerVitalsProvider implements ICapabilityProvider, ICapabilitySer
     public static final Capability<IPlayerVitals> VITALS_CAPABILITY =
             CapabilityManager.get(new CapabilityToken<>(){});
 
-    public static final ResourceLocation KEY = new ResourceLocation("asura", "vitals");
+    public static final ResourceLocation KEY = ResourceLocation.fromNamespaceAndPath("asura", "vitals");
 
     private final Player owner;
     private final PlayerVitals backend = new PlayerVitals();
@@ -29,7 +30,7 @@ public class PlayerVitalsProvider implements ICapabilityProvider, ICapabilitySer
     }
 
     @Override
-    public CompoundTag serializeNBT() {
+    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
         CompoundTag tag = new CompoundTag();
         tag.putInt("temperature", backend.getTemperature());
         tag.putInt("thirst", backend.getThirst());
@@ -37,7 +38,7 @@ public class PlayerVitalsProvider implements ICapabilityProvider, ICapabilitySer
     }
 
     @Override
-    public void deserializeNBT(CompoundTag tag) {
+    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
         if (tag == null) return;
         backend.setTemperature(tag.getInt("temperature"));
         backend.setThirst(tag.getInt("thirst"));

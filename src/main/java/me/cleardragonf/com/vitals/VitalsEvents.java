@@ -24,7 +24,8 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -114,7 +115,7 @@ public class VitalsEvents {
         if (player.level().isClientSide) return;
         ItemStack stack = event.getItem();
         player.getCapability(PlayerVitalsProvider.VITALS_CAPABILITY).ifPresent(v -> {
-            if (stack.is(Items.POTION) && PotionUtils.getPotion(stack) == Potions.WATER) {
+            if (stack.is(Items.POTION) && stack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY).is(Potions.WATER)) {
                 v.addThirst(+me.cleardragonf.com.data.Config.thirstGainWater);
             } else if (stack.is(Items.MILK_BUCKET)) {
                 v.addThirst(+me.cleardragonf.com.data.Config.thirstGainMilk);
