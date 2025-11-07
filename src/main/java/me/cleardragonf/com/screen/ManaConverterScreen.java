@@ -25,6 +25,7 @@ public class ManaConverterScreen extends AbstractContainerScreen<ManaConverterMe
         int x = (this.width - this.imageWidth) / 2;
         int y = (this.height - this.imageHeight) / 2;
         g.blit(GUI_TEX, x, y, 0, 0, this.imageWidth, this.imageHeight);
+        
 
         // Simple progress bars for buffer vs. cost
         int buf = this.menu.getBuffer();
