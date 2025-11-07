@@ -5,6 +5,8 @@ import me.cleardragonf.com.registry.ModEntityTypes;
 import me.cleardragonf.com.spell.Spell;
 import me.cleardragonf.com.spell.SpellRegistry;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -30,7 +32,8 @@ public class WandItem extends Item {
             if (!level.isClientSide) {
                 var learned = getLearned(stack);
                 if (!learned.isEmpty()) {
-                    int sel = stack.getOrCreateTag().getInt("Selected");
+                    CompoundTag tag = getOrCreateData(stack);
+                    int sel = tag.getInt("Selected");
                     sel = (sel + 1) % learned.size();
                     setSelectedIndex(stack, sel);
                     player.displayClientMessage(net.minecraft.network.chat.Component.literal("Selected: " + learned.get(sel)), true);
@@ -41,7 +44,7 @@ public class WandItem extends Item {
         if (level.isClientSide) return InteractionResultHolder.success(stack);
 
         // Right-click = self-cast (Charm) via ProgramChain if present, else via Spell
-        var tag = stack.getOrCreateTag();
+        CompoundTag tag = getOrCreateData(stack);
         if (me.cleardragonf.com.spell.program.ProgramExecutor.hasChain(tag, "self")) {
             int lvl = 1; // could use level per node later
             ServerLevel sl = (ServerLevel) level;
@@ -71,7 +74,7 @@ public class WandItem extends Item {
 
     // NBT helpers: learned spells + selected index
     public static List<String> getLearned(ItemStack stack) {
-        CompoundTag tag = stack.getOrCreateTag();
+        CompoundTag tag = getOrCreateData(stack);
         var list = new ArrayList<String>();
         if (tag.contains("Spells", 9)) { // list of strings
             var l = tag.getList("Spells", 8);
@@ -81,14 +84,15 @@ public class WandItem extends Item {
     }
 
     public static void setLearned(ItemStack stack, List<String> spells) {
-        CompoundTag tag = stack.getOrCreateTag();
+        CompoundTag tag = getOrCreateData(stack);
         net.minecraft.nbt.ListTag l = new net.minecraft.nbt.ListTag();
         for (String s : spells) l.add(net.minecraft.nbt.StringTag.valueOf(s));
         tag.put("Spells", l);
+        setData(stack, tag);
     }
 
     public static String getSelectedSpell(ItemStack stack) {
-        CompoundTag tag = stack.getOrCreateTag();
+        CompoundTag tag = getOrCreateData(stack);
         int idx = tag.getInt("Selected");
         List<String> learned = getLearned(stack);
         if (learned.isEmpty()) return "";
@@ -97,7 +101,9 @@ public class WandItem extends Item {
     }
 
     public static void setSelectedIndex(ItemStack stack, int idx) {
-        stack.getOrCreateTag().putInt("Selected", idx);
+        CompoundTag tag = getOrCreateData(stack);
+        tag.putInt("Selected", idx);
+        setData(stack, tag);
     }
 
     public static void ensureDefaultSpells(ItemStack stack) {
@@ -111,13 +117,13 @@ public class WandItem extends Item {
     }
 
     @Override
-    public void inventoryTick(ItemStack stack, Level level, LivingEntity entity, int slot, boolean selected) {
+    public void inventoryTick(ItemStack stack, Level level, net.minecraft.world.entity.Entity entity, int slot, boolean selected) {
         if (!level.isClientSide) ensureDefaultSpells(stack);
     }
 
     // Per-spell level handling
     public static int getSpellLevel(ItemStack stack, String id) {
-        var tag = stack.getOrCreateTag();
+        CompoundTag tag = getOrCreateData(stack);
         if (tag.contains("SpellLevels", 10)) {
             var m = tag.getCompound("SpellLevels");
             int v = m.getInt(id);
@@ -127,16 +133,17 @@ public class WandItem extends Item {
     }
 
     public static void setSpellLevel(ItemStack stack, String id, int level) {
-        var tag = stack.getOrCreateTag();
+        CompoundTag tag = getOrCreateData(stack);
         var m = tag.getCompound("SpellLevels");
         m.putInt(id, Math.max(1, level));
         tag.put("SpellLevels", m);
+        setData(stack, tag);
     }
 
     // Cast away (projectile) used from input handler
     public static boolean castAway(ServerLevel level, Player player, ItemStack stack) {
         // 1) ProgramChain projectile mode
-        var tag = stack.getOrCreateTag();
+        CompoundTag tag = getOrCreateData(stack);
         if (me.cleardragonf.com.spell.program.ProgramExecutor.hasChain(tag, "projectile")) {
             SpellProjectile proj = me.cleardragonf.com.registry.ModEntityTypes.SPELL_PROJECTILE.get().create(level);
             if (proj == null) return false;
@@ -180,7 +187,7 @@ public class WandItem extends Item {
     }
 
     private static String getProgramActionForType(ItemStack stack, String type) {
-        var tag = stack.getOrCreateTag();
+        CompoundTag tag = getOrCreateData(stack);
         if (tag.contains("Program", 10)) {
             var p = tag.getCompound("Program");
             if (type.equals(p.getString("type"))) {
@@ -188,5 +195,16 @@ public class WandItem extends Item {
             }
         }
         return "";
+    }
+
+    // 1.21+ ItemStack custom data helpers (replacement for getOrCreateTag)
+    private static CompoundTag getOrCreateData(ItemStack stack) {
+        CustomData data = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY);
+        // copyTag() returns a safe, mutable copy. If empty, it returns a new CompoundTag.
+        return data.copyTag();
+    }
+
+    private static void setData(ItemStack stack, CompoundTag tag) {
+        stack.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
     }
 }

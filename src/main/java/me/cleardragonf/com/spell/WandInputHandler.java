@@ -15,7 +15,7 @@ public class WandInputHandler {
         var player = event.getEntity();
         var stack = player.getMainHandItem();
         if (stack.getItem() instanceof WandItem && player.level().isClientSide) {
-            me.cleardragonf.com.network.AsuraNetwork.CHANNEL.sendToServer(new me.cleardragonf.com.network.msg.C2SLeftClickCast());
+            me.cleardragonf.com.network.AsuraNetwork.CHANNEL.send(new me.cleardragonf.com.network.msg.C2SLeftClickCast(), net.minecraftforge.network.PacketDistributor.SERVER.noArg());
         }
     }
 

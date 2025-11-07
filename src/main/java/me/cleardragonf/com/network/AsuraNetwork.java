@@ -9,15 +9,13 @@ import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.SimpleChannel;
 
 public class AsuraNetwork {
-    private static final String PROTOCOL = "1";
+    private static final int PROTOCOL = 1;
     public static SimpleChannel CHANNEL;
 
     public static void register() {
         if (CHANNEL != null) return;
-        CHANNEL = ChannelBuilder.named(new ResourceLocation(Asura.MODID, "main"))
-                .serverAcceptedVersions((s) -> true)
-                .clientAcceptedVersions((s) -> true)
-                .networkProtocolVersion(() -> PROTOCOL)
+        CHANNEL = ChannelBuilder.named(Asura.MODID + ":main")
+                .networkProtocolVersion(PROTOCOL)
                 .simpleChannel();
 
         int id = 0;

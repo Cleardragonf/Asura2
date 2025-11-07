@@ -143,7 +143,7 @@ public class ProgramExecutor {
                     int amp = step.contains("amp") ? step.getInt("amp") : 0;
                     var key = net.minecraft.resources.ResourceLocation.tryParse(eff);
                     var reg = net.minecraftforge.registries.ForgeRegistries.MOB_EFFECTS;
-                    var effect = (key != null) ? reg.getValue(key) : null;
+                    var effect = (key != null) ? reg.getHolder(key).orElse(null) : null;
                     if (effect != null) le.addEffect(new MobEffectInstance(effect, dur, amp));
                 }
             }
@@ -164,7 +164,7 @@ public class ProgramExecutor {
             case "place_block" -> {
                 String blockId = step.getString("block");
                 try {
-                    Block b = net.minecraftforge.registries.ForgeRegistries.BLOCKS.getValue(new ResourceLocation(blockId));
+                    Block b = net.minecraftforge.registries.ForgeRegistries.BLOCKS.getValue(net.minecraft.resources.ResourceLocation.parse(blockId));
                     if (b != null) {
                         BlockState st = b.defaultBlockState();
                         level.setBlock(pos, st, 3);

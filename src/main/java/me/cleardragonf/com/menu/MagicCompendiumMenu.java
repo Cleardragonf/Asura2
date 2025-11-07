@@ -6,6 +6,8 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import me.cleardragonf.com.util.ItemData;
 
 public class MagicCompendiumMenu extends AbstractContainerMenu {
     private final Player player;
@@ -23,46 +25,46 @@ public class MagicCompendiumMenu extends AbstractContainerMenu {
         // 200.. = add nodes; 300 = clear; 301 = save
         ItemStack held = player.getMainHandItem();
         if (!(held.getItem() instanceof WandItem)) return false;
-        var tag = held.getOrCreateTag();
+        CompoundTag tag = ItemData.getOrCreate(held);
         var steps = tag.getCompound("ProgramChainWorking").getList("steps", net.minecraft.nbt.Tag.TAG_COMPOUND);
         switch (buttonId) {
-            case 10 -> { mode = "self"; tag.getOrCreateTag().putString("ProgramChainWorkingMode", mode); return true; }
-            case 11 -> { mode = "projectile"; tag.getOrCreateTag().putString("ProgramChainWorkingMode", mode); return true; }
+            case 10 -> { mode = "self"; tag.putString("ProgramChainWorkingMode", mode); ItemData.set(held, tag); return true; }
+            case 11 -> { mode = "projectile"; tag.putString("ProgramChainWorkingMode", mode); ItemData.set(held, tag); return true; }
             case 200 -> { // heal_self
                 var node = new net.minecraft.nbt.CompoundTag();
                 node.putString("id", "heal_self");
-                steps.add(node); tag.getCompound("ProgramChainWorking").put("steps", steps); return true; }
+                steps.add(node); tag.getCompound("ProgramChainWorking").put("steps", steps); ItemData.set(held, tag); return true; }
             case 201 -> { // damage_target
                 var node = new net.minecraft.nbt.CompoundTag();
                 node.putString("id", "damage_target");
                 node.putFloat("amt", 4.0f);
-                steps.add(node); tag.getCompound("ProgramChainWorking").put("steps", steps); return true; }
+                steps.add(node); tag.getCompound("ProgramChainWorking").put("steps", steps); ItemData.set(held, tag); return true; }
             case 202 -> { // push_target
                 var node = new net.minecraft.nbt.CompoundTag();
                 node.putString("id", "push_target");
                 node.putDouble("strength", 0.5);
-                steps.add(node); tag.getCompound("ProgramChainWorking").put("steps", steps); return true; }
+                steps.add(node); tag.getCompound("ProgramChainWorking").put("steps", steps); ItemData.set(held, tag); return true; }
             case 203 -> { // particle_heart
                 var node = new net.minecraft.nbt.CompoundTag();
                 node.putString("id", "particle_heart");
-                steps.add(node); tag.getCompound("ProgramChainWorking").put("steps", steps); return true; }
+                steps.add(node); tag.getCompound("ProgramChainWorking").put("steps", steps); ItemData.set(held, tag); return true; }
             case 204 -> { // particle_blue
                 var node = new net.minecraft.nbt.CompoundTag();
                 node.putString("id", "particle_blue");
-                steps.add(node); tag.getCompound("ProgramChainWorking").put("steps", steps); return true; }
+                steps.add(node); tag.getCompound("ProgramChainWorking").put("steps", steps); ItemData.set(held, tag); return true; }
             case 205 -> { // place_block stone
                 var node = new net.minecraft.nbt.CompoundTag();
                 node.putString("id", "place_block");
                 node.putString("block", "minecraft:stone");
-                steps.add(node); tag.getCompound("ProgramChainWorking").put("steps", steps); return true; }
+                steps.add(node); tag.getCompound("ProgramChainWorking").put("steps", steps); ItemData.set(held, tag); return true; }
             case 206 -> { // remove_block
                 var node = new net.minecraft.nbt.CompoundTag();
                 node.putString("id", "remove_block");
-                steps.add(node); tag.getCompound("ProgramChainWorking").put("steps", steps); return true; }
+                steps.add(node); tag.getCompound("ProgramChainWorking").put("steps", steps); ItemData.set(held, tag); return true; }
             case 210 -> { // remove last
                 if (!steps.isEmpty()) {
                     steps.remove(steps.size() - 1);
-                    tag.getCompound("ProgramChainWorking").put("steps", steps);
+                    tag.getCompound("ProgramChainWorking").put("steps", steps); ItemData.set(held, tag);
                 }
                 return true; }
             case 211 -> { // inc damage on last
@@ -71,6 +73,7 @@ public class MagicCompendiumMenu extends AbstractContainerMenu {
                     if ("damage_target".equals(last.getString("id"))) {
                         float amt = last.contains("amt") ? last.getFloat("amt") : 4.0f;
                         last.putFloat("amt", Math.min(100f, amt + 1.0f));
+                        ItemData.set(held, tag);
                     }
                 }
                 return true; }
@@ -80,6 +83,7 @@ public class MagicCompendiumMenu extends AbstractContainerMenu {
                     if ("damage_target".equals(last.getString("id"))) {
                         float amt = last.contains("amt") ? last.getFloat("amt") : 4.0f;
                         last.putFloat("amt", Math.max(0f, amt - 1.0f));
+                        ItemData.set(held, tag);
                     }
                 }
                 return true; }
@@ -89,6 +93,7 @@ public class MagicCompendiumMenu extends AbstractContainerMenu {
                     if ("push_target".equals(last.getString("id"))) {
                         double s = last.contains("strength") ? last.getDouble("strength") : 0.5;
                         last.putDouble("strength", Math.min(5.0, s + 0.1));
+                        ItemData.set(held, tag);
                     }
                 }
                 return true; }
@@ -98,6 +103,7 @@ public class MagicCompendiumMenu extends AbstractContainerMenu {
                     if ("push_target".equals(last.getString("id"))) {
                         double s = last.contains("strength") ? last.getDouble("strength") : 0.5;
                         last.putDouble("strength", Math.max(0.0, s - 0.1));
+                        ItemData.set(held, tag);
                     }
                 }
                 return true; }
@@ -111,11 +117,12 @@ public class MagicCompendiumMenu extends AbstractContainerMenu {
                         for (int i = 0; i < options.length; i++) if (options[i].equals(cur)) { idx = i; break; }
                         idx = (idx + 1) % options.length;
                         last.putString("block", options[idx]);
+                        ItemData.set(held, tag);
                     }
                 }
                 return true; }
             case 300 -> { // clear
-                tag.put("ProgramChainWorking", new net.minecraft.nbt.CompoundTag()); return true; }
+                tag.put("ProgramChainWorking", new net.minecraft.nbt.CompoundTag()); ItemData.set(held, tag); return true; }
             case 301 -> { // save -> ProgramChain
                 var working = tag.getCompound("ProgramChainWorking");
                 var list = working.getList("steps", net.minecraft.nbt.Tag.TAG_COMPOUND);
@@ -124,6 +131,7 @@ public class MagicCompendiumMenu extends AbstractContainerMenu {
                 chain.putString("mode", tag.getString("ProgramChainWorkingMode").isEmpty() ? mode : tag.getString("ProgramChainWorkingMode"));
                 chain.put("steps", list.copy());
                 tag.put("ProgramChain", chain);
+                ItemData.set(held, tag);
                 return true; }
         }
         return false;
@@ -131,4 +139,9 @@ public class MagicCompendiumMenu extends AbstractContainerMenu {
 
     @Override
     public boolean stillValid(Player player) { return true; }
+
+    @Override
+    public net.minecraft.world.item.ItemStack quickMoveStack(Player player, int index) {
+        return net.minecraft.world.item.ItemStack.EMPTY;
+    }
 }

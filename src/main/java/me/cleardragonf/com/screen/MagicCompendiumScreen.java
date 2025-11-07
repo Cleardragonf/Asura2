@@ -146,8 +146,9 @@ public class MagicCompendiumScreen extends AbstractContainerScreen<MagicCompendi
         net.minecraft.nbt.CompoundTag chain = new net.minecraft.nbt.CompoundTag();
         chain.putString("mode", mode);
         chain.put("steps", list);
-        me.cleardragonf.com.network.AsuraNetwork.CHANNEL.sendToServer(
-                new me.cleardragonf.com.network.msg.C2SSetProgramChain(mode, chain)
+        me.cleardragonf.com.network.AsuraNetwork.CHANNEL.send(
+                new me.cleardragonf.com.network.msg.C2SSetProgramChain(mode, chain),
+                net.minecraftforge.network.PacketDistributor.SERVER.noArg()
         );
         if (this.minecraft != null && this.minecraft.player != null) {
             this.minecraft.player.displayClientMessage(Component.literal("Saved program (" + mode + ")"), true);
@@ -159,7 +160,7 @@ public class MagicCompendiumScreen extends AbstractContainerScreen<MagicCompendi
         var player = this.minecraft != null ? this.minecraft.player : null;
         if (player == null) return;
         var stack = player.getMainHandItem();
-        var tag = stack.getOrCreateTag();
+        net.minecraft.nbt.CompoundTag tag = me.cleardragonf.com.util.ItemData.getOrCreate(stack);
         var chain = me.cleardragonf.com.spell.program.ProgramExecutor.getChain(tag, mode);
         if (chain == null) return;
         var list = chain.getList("steps", net.minecraft.nbt.Tag.TAG_COMPOUND);

@@ -17,7 +17,6 @@ import java.util.ArrayList;
 public class MagicCompendiumBlock extends Block {
     public MagicCompendiumBlock(Properties props) { super(props); }
 
-    @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         ItemStack held = player.getItemInHand(hand);
         if (!level.isClientSide && held.getItem() instanceof WandItem) {
@@ -29,8 +28,7 @@ public class MagicCompendiumBlock extends Block {
             }
             WandItem.setLearned(held, all);
             WandItem.setSelectedIndex(held, 0);
-            net.minecraftforge.network.NetworkHooks.openScreen(
-                    (net.minecraft.server.level.ServerPlayer) player,
+            ((net.minecraft.server.level.ServerPlayer) player).openMenu(
                     new net.minecraft.world.SimpleMenuProvider(
                             (id, inv, p) -> new me.cleardragonf.com.menu.MagicCompendiumMenu(id, inv),
                             net.minecraft.network.chat.Component.literal("Magic Compendium")

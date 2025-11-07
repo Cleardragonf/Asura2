@@ -19,7 +19,7 @@ public class ModEntityTypes {
                     .sized(0.25f, 0.25f)
                     .clientTrackingRange(64)
                     .updateInterval(10)
-                    .build(new ResourceLocation(Asura.MODID, "spell_projectile").toString())
+                    .build(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(Asura.MODID, "spell_projectile").toString())
     );
 }
 
