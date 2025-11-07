@@ -2,10 +2,12 @@ package me.cleardragonf.com.event;
 
 import me.cleardragonf.com.util.RomanNumerals;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -22,16 +24,21 @@ public class ClientTooltipEvents {
     public static void onItemTooltip(ItemTooltipEvent event) {
         ItemStack stack = event.getItemStack();
 
-        Map<Enchantment, Integer> enchants = EnchantmentHelper.getEnchantments(stack);
-        if (enchants.isEmpty()) return;
+        ItemEnchantments itemEnchants = stack.getOrDefault(DataComponents.ENCHANTMENTS, ItemEnchantments.EMPTY);
+        if (itemEnchants.isEmpty()) return;
 
         List<Component> tooltip = event.getToolTip();
 
         // Build a set of base names for fast matching
         Map<String, Integer> levelsByBaseName = new HashMap<>();
-        for (Map.Entry<Enchantment, Integer> e : enchants.entrySet()) {
-            String base = Component.translatable(e.getKey().getDescriptionId()).getString();
-            levelsByBaseName.put(base, e.getValue());
+        for (var e : itemEnchants.entrySet()) {
+            @SuppressWarnings("unchecked")
+            net.minecraft.core.Holder<Enchantment> holder = (net.minecraft.core.Holder<Enchantment>) e.getKey();
+            holder.unwrapKey().ifPresent(key -> {
+                var rl = key.location();
+                String base = Component.translatable("enchantment." + rl.getNamespace() + "." + rl.getPath()).getString();
+                levelsByBaseName.put(base, (Integer) e.getValue());
+            });
         }
 
         // Remove existing enchantment lines (basic heuristic: lines starting with the translated base name)
