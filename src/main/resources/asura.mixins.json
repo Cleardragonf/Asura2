@@ -4,10 +4,8 @@
   "package": "me.cleardragonf.com.mixin",
   "compatibilityLevel": "JAVA_21",
   "refmap": "asura.refmap.json",
-  "mixins": [
-  ],
-  "client": [
-  ],
+  "mixins": [],
+  "client": [],
   "injectors": {
     "defaultRequire": 1
   },
