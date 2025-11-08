@@ -1,10 +1,13 @@
 {
-  "block.asura.mana_generator": "魔力发生器",
-  "block.asura.mana_ore": "魔力矿石",
-  "block.asura.deepslate_mana_ore": "深板岩魔力矿石",
-  "block.asura.mana_battery": "魔力电池",
-  "block.asura.mana_relay": "魔力中继器",
-  "item.asura.linking_wand": "连接法杖",
-  "item.asura.mana_shard": "魔力碎片",
-  "itemGroup.asura.asura_tab": "Asura"
+    "block.asura.mana_generator":  "魔力发生器",
+    "block.asura.mana_ore":  "魔力矿石",
+    "block.asura.deepslate_mana_ore":  "深板岩魔力矿石",
+    "block.asura.mana_battery":  "魔力电池",
+    "block.asura.mana_relay":  "魔力中继器",
+    "item.asura.linking_wand":  "连接法杖",
+    "item.asura.mana_shard":  "魔力碎片",
+    "itemGroup.asura.asura_tab":  "Asura",
+    "gui.asura.master_ward_stone.list_title":  "Ward List",
+    "gui.asura.master_ward_stone.options_title":  "Options"
 }
+

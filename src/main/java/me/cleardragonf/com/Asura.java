@@ -74,6 +74,10 @@ public class Asura {
                         output.accept(me.cleardragonf.com.registry.ModItems.CANTEEN.get());
                         output.accept(me.cleardragonf.com.registry.ModItems.WAND.get());
                         output.accept(me.cleardragonf.com.registry.ModBlocks.MAGIC_COMPENDIUM_ITEM.get());
+                        output.accept(me.cleardragonf.com.registry.ModBlocks.MASTER_WARD_STONE_ITEM.get());
+                        output.accept(me.cleardragonf.com.registry.ModBlocks.WARD_STONE_ITEM.get());
+                        output.accept(me.cleardragonf.com.registry.ModItems.WARD_SPELL_ITEM.get());
+                        output.accept(me.cleardragonf.com.registry.ModItems.HEAL_WARD.get());
                     })
                     .build());
 
@@ -128,6 +132,7 @@ public class Asura {
                 MenuScreens.register(ModMenus.MANA_BATTERY_MENU.get(), ManaBatteryScreen::new);
                 MenuScreens.register(ModMenus.MANA_CONVERTER_MENU.get(), ManaConverterScreen::new);
                 MenuScreens.register(ModMenus.MAGIC_COMPENDIUM_MENU.get(), MagicCompendiumScreen::new);
+                MenuScreens.register(ModMenus.MASTER_WARD_STONE_MENU.get(), me.cleardragonf.com.screen.MasterWardStoneScreen::new);
                 net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(
                         ModBlockEntities.MANA_BATTERY_ENTITY.get(), ManaBatteryRenderer::new);
                 net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(

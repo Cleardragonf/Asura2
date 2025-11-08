@@ -30,6 +30,10 @@ public class ModBlockStateProvider extends BlockStateProvider {
 
         // Mana Converter: use generator texture until a dedicated one is provided
         blockWithExplicitTexture(ModBlocks.MANA_CONVERTER, modLoc("block/mana_generator"));
+
+        // Ward system blocks: use generator texture as placeholder
+        blockWithExplicitTexture(ModBlocks.MASTER_WARD_STONE, modLoc("block/mana_generator"));
+        blockWithExplicitTexture(ModBlocks.WARD_STONE, modLoc("block/mana_generator"));
     }
 
     private void blockWithItem(RegistryObject<Block> blockRegistryObject){

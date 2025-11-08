@@ -25,5 +25,11 @@ public class ModItemModelProvider extends ItemModelProvider {
         withExistingParent("mana_battery", mcLoc("item/generated")).texture("layer0", modLoc("block/mana_battery"));
         withExistingParent("mana_relay", mcLoc("item/generated")).texture("layer0", modLoc("block/mana_relay"));
         withExistingParent("mana_converter", mcLoc("item/generated")).texture("layer0", modLoc("block/mana_generator"));
+
+        // Ward system items
+        withExistingParent("master_ward_stone", mcLoc("item/generated")).texture("layer0", modLoc("block/mana_generator"));
+        withExistingParent("ward_stone", mcLoc("item/generated")).texture("layer0", modLoc("block/mana_generator"));
+        withExistingParent(ModItems.WARD_SPELL_ITEM.getId().getPath(), mcLoc("item/generated")).texture("layer0", mcLoc("item/paper"));
+        withExistingParent(ModItems.HEAL_WARD.getId().getPath(), mcLoc("item/generated")).texture("layer0", mcLoc("item/paper"));
     }
 }

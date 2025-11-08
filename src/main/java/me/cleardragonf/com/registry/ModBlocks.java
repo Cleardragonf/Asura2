@@ -5,6 +5,8 @@ import me.cleardragonf.com.block.ManaBatteryBlock;
 import me.cleardragonf.com.block.ManaRelayBlock;
 import me.cleardragonf.com.block.ManaGeneratorBlock;
 import me.cleardragonf.com.block.MagicCompendiumBlock;
+import me.cleardragonf.com.block.MasterWardStoneBlock;
+import me.cleardragonf.com.block.WardStoneBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
@@ -124,6 +126,36 @@ public class ModBlocks {
     public static final RegistryObject<Item> MAGIC_COMPENDIUM_ITEM = ModItems.ITEMS.register(
             "magic_compendium",
             () -> new BlockItem(MAGIC_COMPENDIUM.get(), new Item.Properties())
+    );
+
+    // Ward System
+    public static final RegistryObject<Block> MASTER_WARD_STONE = BLOCKS.register(
+            "master_ward_stone",
+            () -> new MasterWardStoneBlock(BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.COLOR_PURPLE)
+                    .strength(2.0f, 6.0f)
+                    .sound(SoundType.AMETHYST)
+                    .noOcclusion()
+                    .pushReaction(PushReaction.NORMAL))
+    );
+
+    public static final RegistryObject<Item> MASTER_WARD_STONE_ITEM = ModItems.ITEMS.register(
+            "master_ward_stone",
+            () -> new BlockItem(MASTER_WARD_STONE.get(), new Item.Properties())
+    );
+
+    public static final RegistryObject<Block> WARD_STONE = BLOCKS.register(
+            "ward_stone",
+            () -> new WardStoneBlock(BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.COLOR_PURPLE)
+                    .strength(1.5f, 6.0f)
+                    .sound(SoundType.AMETHYST)
+                    .pushReaction(PushReaction.NORMAL))
+    );
+
+    public static final RegistryObject<Item> WARD_STONE_ITEM = ModItems.ITEMS.register(
+            "ward_stone",
+            () -> new BlockItem(WARD_STONE.get(), new Item.Properties())
     );
 
 }

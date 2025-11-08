@@ -4,6 +4,7 @@ import me.cleardragonf.com.menu.ManaBatteryMenu;
 import me.cleardragonf.com.menu.ManaConverterMenu;
 import me.cleardragonf.com.menu.ManaGeneratorMenu;
 import me.cleardragonf.com.menu.MagicCompendiumMenu;
+import me.cleardragonf.com.menu.MasterWardStoneMenu;
 import me.cleardragonf.com.Asura;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.SimpleContainerData;
@@ -38,5 +39,11 @@ public class ModMenus {
             MENUS.register("magic_compendium_menu",
                     () -> IForgeMenuType.create((windowId, inv, player) ->
                             new MagicCompendiumMenu(windowId, inv)
+                    ));
+
+    public static final RegistryObject<MenuType<MasterWardStoneMenu>> MASTER_WARD_STONE_MENU =
+            MENUS.register("master_ward_stone_menu",
+                    () -> IForgeMenuType.create((windowId, inv, buf) ->
+                            new MasterWardStoneMenu(windowId, inv, buf.readBlockPos())
                     ));
 }

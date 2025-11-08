@@ -21,6 +21,8 @@ public class ModBlockLootTableProvider extends BlockLootSubProvider {
         dropSelf(ModBlocks.MANA_RELAY.get());
         dropSelf(ModBlocks.MANA_CONVERTER.get());
         dropSelf(ModBlocks.MAGIC_COMPENDIUM.get());
+        dropSelf(ModBlocks.MASTER_WARD_STONE.get());
+        dropSelf(ModBlocks.WARD_STONE.get());
         add(ModBlocks.MANA_ORE.get(), createOreDrop(ModBlocks.MANA_ORE.get(), me.cleardragonf.com.registry.ModItems.MANA_SHARD.get()));
         add(ModBlocks.DEEPSLATE_MANA_ORE.get(), createOreDrop(ModBlocks.DEEPSLATE_MANA_ORE.get(), me.cleardragonf.com.registry.ModItems.MANA_SHARD.get()));
     }

@@ -1,11 +1,14 @@
 {
-  "block.asura.mana_generator": "Mana Generator",
-  "block.asura.mana_ore": "Mana Ore",
-  "block.asura.deepslate_mana_ore": "Deepslate Mana Ore",
-  "block.asura.mana_battery": "Mana Battery",
-  "block.asura.mana_relay": "Mana Relay",
-  "item.asura.linking_wand": "Linking Wand",
-  "item.asura.mana_shard": "Mana Shard",
-  "item.asura.canteen": "Canteen",
-  "itemGroup.asura.asura_tab": "Asura"
+    "block.asura.mana_generator":  "Mana Generator",
+    "block.asura.mana_ore":  "Mana Ore",
+    "block.asura.deepslate_mana_ore":  "Deepslate Mana Ore",
+    "block.asura.mana_battery":  "Mana Battery",
+    "block.asura.mana_relay":  "Mana Relay",
+    "item.asura.linking_wand":  "Linking Wand",
+    "item.asura.mana_shard":  "Mana Shard",
+    "item.asura.canteen":  "Canteen",
+    "itemGroup.asura.asura_tab":  "Asura",
+    "gui.asura.master_ward_stone.list_title":  "Ward List",
+    "gui.asura.master_ward_stone.options_title":  "Options"
 }
+

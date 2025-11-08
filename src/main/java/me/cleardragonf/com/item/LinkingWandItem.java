@@ -1,6 +1,8 @@
 package me.cleardragonf.com.item;
 
 import me.cleardragonf.com.blockentity.ManaRelayBlockEntity;
+import me.cleardragonf.com.blockentity.MasterWardStoneBlockEntity;
+import me.cleardragonf.com.block.WardStoneBlock;
 import me.cleardragonf.com.blockentity.ManaBatteryBlockEntity;
 import me.cleardragonf.com.blockentity.ManaGeneratorBlockEntity;
 import net.minecraft.core.BlockPos;
@@ -21,6 +23,7 @@ public class LinkingWandItem extends Item {
         if (level.isClientSide) return InteractionResult.SUCCESS;
         var pos = ctx.getClickedPos();
         BlockEntity be = level.getBlockEntity(pos);
+        var state = level.getBlockState(pos);
 
         var player = ctx.getPlayer();
         if (player == null) return InteractionResult.PASS;
@@ -69,6 +72,33 @@ public class LinkingWandItem extends Item {
             return InteractionResult.CONSUME;
         }
 
+        // Ward system linking
+        if (be instanceof MasterWardStoneBlockEntity) {
+            // Toggle/select master ward stone for linking
+            if (sel.pendingWardMaster != null && sel.pendingWardMaster.equals(pos)) {
+                sel.pendingWardMaster = null;
+                player.displayClientMessage(net.minecraft.network.chat.Component.literal("Cleared Master Ward selection"), true);
+            } else {
+                sel.pendingWardMaster = pos;
+                player.displayClientMessage(net.minecraft.network.chat.Component.literal("Selected Master Ward Stone. Click Ward Stones to link."), true);
+            }
+            return InteractionResult.CONSUME;
+        }
+
+        if (state != null && state.getBlock() instanceof WardStoneBlock) {
+            if (sel.pendingWardMaster != null) {
+                BlockEntity mbe = level.getBlockEntity(sel.pendingWardMaster);
+                if (mbe instanceof MasterWardStoneBlockEntity master) {
+                    master.addWardStone(pos);
+                    player.displayClientMessage(net.minecraft.network.chat.Component.literal("Linked Ward Stone → Master"), true);
+                    return InteractionResult.CONSUME;
+                }
+            }
+            // If clicked ward stone without a selected master, prompt user
+            player.displayClientMessage(net.minecraft.network.chat.Component.literal("No Master Ward selected. Click a Master Ward Stone first."), true);
+            return InteractionResult.CONSUME;
+        }
+
         // Receivers clicked (battery, converter, etc.): set output on pending relay
         if (be instanceof me.cleardragonf.com.api.ManaReceiver) {
             if (sel.pendingRelay != null) {
@@ -90,5 +120,7 @@ public class LinkingWandItem extends Item {
 class Selection {
     public BlockPos source;
     public BlockPos pendingRelay;
+    // Ward linking state
+    public BlockPos pendingWardMaster;
     public static final ConcurrentHashMap<UUID, Selection> STATE = new ConcurrentHashMap<>();
 }

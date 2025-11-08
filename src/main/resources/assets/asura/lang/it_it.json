@@ -1,10 +1,13 @@
 {
-  "block.asura.mana_generator": "Generatore di Mana",
-  "block.asura.mana_ore": "Minerale di Mana",
-  "block.asura.deepslate_mana_ore": "Minerale di Mana di ardesia profonda",
-  "block.asura.mana_battery": "Batteria di Mana",
-  "block.asura.mana_relay": "Relè di Mana",
-  "item.asura.linking_wand": "Bacchetta di Collegamento",
-  "item.asura.mana_shard": "Frammento di Mana",
-  "itemGroup.asura.asura_tab": "Asura"
+    "block.asura.mana_generator":  "Generatore di Mana",
+    "block.asura.mana_ore":  "Minerale di Mana",
+    "block.asura.deepslate_mana_ore":  "Minerale di Mana di ardesia profonda",
+    "block.asura.mana_battery":  "Batteria di Mana",
+    "block.asura.mana_relay":  "Relè di Mana",
+    "item.asura.linking_wand":  "Bacchetta di Collegamento",
+    "item.asura.mana_shard":  "Frammento di Mana",
+    "itemGroup.asura.asura_tab":  "Asura",
+    "gui.asura.master_ward_stone.list_title":  "Ward List",
+    "gui.asura.master_ward_stone.options_title":  "Options"
 }
+

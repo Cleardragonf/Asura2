@@ -20,4 +20,11 @@ public class ModItems {
 
     public static final net.minecraftforge.registries.RegistryObject<Item> WAND =
             ITEMS.register("wand", () -> new me.cleardragonf.com.item.WandItem(new Item.Properties().stacksTo(1)));
+
+    public static final net.minecraftforge.registries.RegistryObject<Item> WARD_SPELL_ITEM =
+            ITEMS.register("ward_spell_item", () -> new me.cleardragonf.com.item.WardSpellItem(new Item.Properties().stacksTo(1)));
+
+    // Example specialized ward item: Healing Ward
+    public static final net.minecraftforge.registries.RegistryObject<Item> HEAL_WARD =
+            ITEMS.register("heal_ward", () -> new me.cleardragonf.com.item.HealWardItem(new Item.Properties().stacksTo(1)));
 }

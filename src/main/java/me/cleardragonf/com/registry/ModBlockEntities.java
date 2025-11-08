@@ -5,6 +5,7 @@ import me.cleardragonf.com.blockentity.ManaBatteryBlockEntity;
 import me.cleardragonf.com.blockentity.ManaGeneratorBlockEntity;
 import me.cleardragonf.com.blockentity.ManaRelayBlockEntity;
 import me.cleardragonf.com.blockentity.ManaConverterBlockEntity;
+import me.cleardragonf.com.blockentity.MasterWardStoneBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -40,5 +41,12 @@ public class ModBlockEntities {
                     () -> BlockEntityType.Builder.of(
                             ManaConverterBlockEntity::new,
                             ModBlocks.MANA_CONVERTER.get()
+                    ).build(null));
+
+    public static final RegistryObject<BlockEntityType<MasterWardStoneBlockEntity>> MASTER_WARD_STONE_ENTITY =
+            BLOCK_ENTITIES.register("master_ward_stone_entity",
+                    () -> BlockEntityType.Builder.of(
+                            MasterWardStoneBlockEntity::new,
+                            ModBlocks.MASTER_WARD_STONE.get()
                     ).build(null));
 }

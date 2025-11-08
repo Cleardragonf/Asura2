@@ -21,7 +21,9 @@ public class ModBlockTagProvider extends BlockTagsProvider {
         tag(BlockTags.MINEABLE_WITH_PICKAXE)
                 .add(ModBlocks.MANA_GENERATOR.get())
                 .add(ModBlocks.MANA_ORE.get())
-                .add(ModBlocks.DEEPSLATE_MANA_ORE.get());
+                .add(ModBlocks.DEEPSLATE_MANA_ORE.get())
+                .add(ModBlocks.MASTER_WARD_STONE.get())
+                .add(ModBlocks.WARD_STONE.get());
 
         tag(BlockTags.NEEDS_DIAMOND_TOOL)
                 .add(ModBlocks.MANA_GENERATOR.get());
